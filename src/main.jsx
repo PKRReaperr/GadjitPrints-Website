@@ -96,7 +96,7 @@ const products = [
     category: 'Ornaments & Gifts',
     variant: 'ornament',
     sourceUrl: 'https://makerworld.com/en/models/2740326-fully-customizable-initial-ornament-and-name#profileId-3038641',
-    imageUrls: [],
+    imageUrls: ['/products/initial-ornament-name.png'],
     copy: 'A personalized ornament built around a large initial, custom name text, and a finished hanging loop.',
     colors: ['Bone', 'Clay', 'Amber', 'White on smoke'].map((name) => ({ name, ...colorLibrary[name] })),
     config: ['Initial letter', 'Name text', 'Loop style'],
