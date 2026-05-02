@@ -4,6 +4,7 @@ import { Navigate, NavLink, Route, BrowserRouter as Router, Routes, useLocation,
 import {
   ArrowRight,
   Check,
+  ChevronLeft,
   ChevronRight,
   Info,
   Layers3,
@@ -299,9 +300,6 @@ function Hero() {
           <NavLink className="button button-primary" to="/collection">
             Browse products <ArrowRight size={18} />
           </NavLink>
-          <NavLink className="button button-ghost" to="/collection">
-            See configurable prints <ChevronRight size={18} />
-          </NavLink>
         </div>
       </div>
       <div className="hero-objects" aria-hidden="true">
@@ -318,6 +316,11 @@ function Hero() {
 }
 
 function FeaturedWork() {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selectedProduct = products[selectedIndex];
+  const previousProduct = () => setSelectedIndex((index) => (index === 0 ? products.length - 1 : index - 1));
+  const nextProduct = () => setSelectedIndex((index) => (index === products.length - 1 ? 0 : index + 1));
+
   return (
     <section className="section">
       <SectionIntro
@@ -325,19 +328,48 @@ function FeaturedWork() {
         title="Useful printed pieces, personalized before production."
         copy="Browse products that are ready to customize with available colors, materials, names, QR codes, labels, sizing, and layout details."
       />
-      <div className="work-grid">
-        {products.slice(0, 3).map((item, index) => (
-          <article className="work-card reveal" key={item.title} style={{ transitionDelay: `${index * 80}ms` }}>
-            <div className="work-image">
-              <ProductVisual variant={item.variant} tone={item.colors[0].swatch} />
+      <div className="product-carousel reveal">
+        <div className="carousel-stage" key={selectedProduct.slug}>
+          <NavLink className="carousel-media" to={`/collection/${selectedProduct.slug}`}>
+            <ProductMedia product={selectedProduct} selectedColor={selectedProduct.colors[0]} imageIndex={0} />
+          </NavLink>
+          <div className="carousel-copy">
+            <span>{selectedProduct.type}</span>
+            <h3>{selectedProduct.title}</h3>
+            <p>{selectedProduct.copy}</p>
+            <div className="carousel-meta">
+              <small>{selectedProduct.price}</small>
+              <small>{selectedProduct.leadTime}</small>
+              <small>{selectedProduct.config.slice(0, 2).join(' / ')}</small>
             </div>
-            <div className="work-body">
-              <span>{item.type}</span>
-              <h3>{item.title}</h3>
-              <p>{item.copy}</p>
-            </div>
-          </article>
-        ))}
+            <NavLink className="text-link" to={`/collection/${selectedProduct.slug}`}>
+              View product <ArrowRight size={17} />
+            </NavLink>
+          </div>
+        </div>
+        <div className="carousel-controls">
+          <button type="button" onClick={previousProduct} aria-label="Previous product">
+            <ChevronLeft size={18} />
+          </button>
+          <div className="carousel-menu" role="tablist" aria-label="Homepage product carousel">
+            {products.map((product, index) => (
+              <button
+                className={selectedIndex === index ? 'is-active' : ''}
+                key={product.slug}
+                type="button"
+                role="tab"
+                aria-selected={selectedIndex === index}
+                onClick={() => setSelectedIndex(index)}
+              >
+                <span>{product.title}</span>
+                <small>{product.type}</small>
+              </button>
+            ))}
+          </div>
+          <button type="button" onClick={nextProduct} aria-label="Next product">
+            <ChevronRight size={18} />
+          </button>
+        </div>
       </div>
     </section>
   );
