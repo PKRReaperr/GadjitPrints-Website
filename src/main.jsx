@@ -70,79 +70,99 @@ const colorLibrary = {
 
 const products = [
   {
-    slug: 'contour-vessel',
-    title: 'Contour Vessel',
-    type: 'Planter / decor form',
-    category: 'Home Objects',
-    variant: 'vessel',
-    copy: 'A sculptural tabletop vessel with a faceted body, optional insert, and a soft matte surface.',
-    colors: ['Bone', 'Charcoal', 'Clay', 'Smoke'].map((name) => ({ name, ...colorLibrary[name] })),
-    config: ['Tall or low profile', 'Drainage tray', 'Smooth or ribbed wall'],
-    price: 'From $34',
+    slug: 'qr-business-card',
+    title: 'QR Business Card',
+    type: 'Custom contact card',
+    category: 'Business & Branding',
+    variant: 'business-card',
+    sourceUrl: 'https://makerworld.com/en/models/2584791-business-card-bc036qr?from=recommend#profileId-2851280',
+    imageUrls: [
+      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUSa79b282bc488cd%2Fdesign%2F98883af3adbe048c.png&w=828',
+      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUSa79b282bc488cd%2Fdesign%2Fbe65cd04b4540925.jpg&w=828',
+    ],
+    copy: 'A rigid printed business card with raised text, a scannable QR area, and a clean pocketable profile.',
+    colors: ['Bone', 'Charcoal', 'Amber', 'Stone'].map((name) => ({ name, ...colorLibrary[name] })),
+    config: ['Name and title', 'QR destination', 'Logo or small icon'],
+    price: 'From $18',
+    leadTime: '2-4 studio days',
+    dimensions: 'Standard card footprint',
+    finish: 'Flat two-tone detail',
+    includes: ['QR code area', 'Custom name text', 'Optional logo mark'],
+  },
+  {
+    slug: 'initial-ornament-name',
+    title: 'Initial Ornament & Name',
+    type: 'Personal ornament',
+    category: 'Ornaments & Gifts',
+    variant: 'ornament',
+    sourceUrl: 'https://makerworld.com/en/models/2740326-fully-customizable-initial-ornament-and-name#profileId-3038641',
+    imageUrls: [],
+    copy: 'A personalized ornament built around a large initial, custom name text, and a finished hanging loop.',
+    colors: ['Bone', 'Clay', 'Amber', 'White on smoke'].map((name) => ({ name, ...colorLibrary[name] })),
+    config: ['Initial letter', 'Name text', 'Loop style'],
+    price: 'From $16',
+    leadTime: '2-4 studio days',
+    dimensions: '3-5 in ornament span',
+    finish: 'Layered raised lettering',
+    includes: ['Large initial', 'Custom name', 'Hanging loop'],
+  },
+  {
+    slug: 'custom-door-hanger',
+    title: 'Custom Door Hanger',
+    type: 'Door sign',
+    category: 'Signs & Labels',
+    variant: 'door-hanger',
+    sourceUrl: 'https://makerworld.com/en/models/2737514-customizable-door-hanger-text-svg-emoji-support#profileId-3035138',
+    imageUrls: [],
+    copy: 'A customizable door hanger with text, SVG, or emoji-style artwork support for rooms, studios, and events.',
+    colors: ['Charcoal', 'Bone', 'Moss', 'Sand'].map((name) => ({ name, ...colorLibrary[name] })),
+    config: ['Front text', 'Icon or SVG', 'Single or two-tone'],
+    price: 'From $22',
     leadTime: '3-5 studio days',
-    dimensions: '4.5-8 in height',
-    finish: 'Matte or softly ribbed',
-    includes: ['Optional insert', 'Drainage tray option', 'Low or tall silhouette'],
+    dimensions: 'Standard door-hanger scale',
+    finish: 'Durable readable face',
+    includes: ['Custom phrase', 'Graphic option', 'Door knob cutout'],
   },
   {
-    slug: 'modular-desk-dock',
-    title: 'Modular Desk Dock',
-    type: 'Workspace organizer',
-    category: 'Desk Goods',
-    variant: 'dock',
-    copy: 'A clean modular dock for keys, watches, remotes, pens, or daily-carry pieces.',
-    colors: ['Graphite', 'Stone', 'Amber', 'Olive'].map((name) => ({ name, ...colorLibrary[name] })),
-    config: ['Tray layout', 'Cable notch', 'Name or initials'],
-    price: 'From $28',
+    slug: 'qr-luggage-bag-tag',
+    title: 'QR Luggage / Bag Tag',
+    type: 'Travel tag',
+    category: 'Travel & Gear',
+    variant: 'bag-tag',
+    sourceUrl: 'https://makerworld.com/en/models/710726-custom-qr-code-luggage-bag-tag?from=search#profileId-641133',
+    imageUrls: [
+      'https://makerworld.bblmw.com/makerworld/model/USc7eb59bdce5c4b/design/2024-10-17_4706bf9541546.jpg?x-oss-process=image%2Fresize%2Cw_1000%2Fformat%2Cwebp',
+      'https://makerworld.bblmw.com/makerworld/model/USc7eb59bdce5c4b/design/2024-10-17_6e2de6ddb58ca.jpg?x-oss-process=image%2Fresize%2Cw_1000%2Fformat%2Cwebp',
+    ],
+    copy: 'A custom travel tag with a QR code, name field, and sturdy strap slot for luggage, backpacks, and gear bags.',
+    colors: ['Graphite', 'Amber', 'Olive', 'Mist'].map((name) => ({ name, ...colorLibrary[name] })),
+    config: ['QR destination', 'Name or handle', 'Tag size'],
+    price: 'From $20',
     leadTime: '2-4 studio days',
-    dimensions: '7-11 in width',
-    finish: 'Satin utility surface',
-    includes: ['Tray layout choice', 'Cable notch option', 'Initials or short label'],
+    dimensions: 'Medium or large tag',
+    finish: 'Raised QR and text panel',
+    includes: ['QR code panel', 'Name field', 'Strap slot'],
   },
   {
-    slug: 'display-riser-set',
-    title: 'Display Riser Set',
-    type: 'Shelf / product staging',
-    category: 'Display',
-    variant: 'risers',
-    copy: 'A set of dimensional risers for collectibles, product photos, candles, miniatures, or display shelves.',
-    colors: ['Bone', 'Satin black', 'Mist', 'Warm gray'].map((name) => ({ name, ...colorLibrary[name] })),
-    config: ['Set of 2, 3, or 5', 'Rounded or crisp edge', 'Stacked heights'],
-    price: 'From $32',
-    leadTime: '3-6 studio days',
-    dimensions: '2-6 in riser span',
-    finish: 'Clean architectural edges',
-    includes: ['Set count choice', 'Stacked height mix', 'Rounded or crisp edges'],
-  },
-  {
-    slug: 'wall-key-rail',
-    title: 'Wall Key Rail',
-    type: 'Entryway utility',
-    category: 'Utility',
-    variant: 'rail',
-    copy: 'A minimal wall rail with printed hooks, labels, and a quiet architectural profile.',
-    colors: ['Charcoal', 'Stone', 'Moss', 'Sand'].map((name) => ({ name, ...colorLibrary[name] })),
-    config: ['3 to 7 hooks', 'Label tabs', 'Hidden screw caps'],
-    price: 'From $38',
-    leadTime: '4-6 studio days',
-    dimensions: '9-18 in rail length',
-    finish: 'Durable entryway texture',
-    includes: ['Hook count choice', 'Optional label tabs', 'Hidden screw caps'],
-  },
-  {
-    slug: 'personal-nameplate',
-    title: 'Personal Nameplate',
-    type: 'Gift / desk marker',
-    category: 'Personal Gifts',
-    variant: 'nameplate',
-    copy: 'A personal desk or shelf marker with raised lettering, symbols, and a weighted-looking base.',
+    slug: 'qr-nameplate-stand',
+    title: 'QR Name Plate Stand',
+    type: 'Desk or wall nameplate',
+    category: 'Business & Branding',
+    variant: 'qr-plate',
+    sourceUrl: 'https://makerworld.com/en/models/2614672-customizable-qr-code-name-plate-stand-or-wall?from=search#profileId-2885404',
+    imageUrls: [
+      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2F0c7a09d0b146db1f.jpg&w=828',
+      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2F589c7773c818d9aa.jpg&w=828',
+      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2Ff50dbabe572c2658.jpg&w=828',
+    ],
+    copy: 'A configurable name plate with QR code support that can sit on a desk or mount to a wall.',
     colors: ['Bone on charcoal', 'Amber on black', 'Clay on stone', 'White on smoke'].map((name) => ({ name, ...colorLibrary[name] })),
-    config: ['Text style', 'Small icon', 'Desk or wall mount'],
-    price: 'From $24',
-    leadTime: '2-4 studio days',
+    config: ['Display text', 'QR destination', 'Stand or wall mount'],
+    price: 'From $26',
+    leadTime: '3-5 studio days',
     dimensions: '5-10 in width',
-    finish: 'Raised two-tone detail',
-    includes: ['Text style choice', 'Small icon option', 'Desk or wall mount'],
+    finish: 'Raised two-tone signage',
+    includes: ['QR code panel', 'Custom display name', 'Stand or wall option'],
   },
 ];
 
@@ -277,13 +297,13 @@ function Hero() {
         </div>
       </div>
       <div className="hero-objects" aria-hidden="true">
-        <ProductVisual variant="vessel" tone={products[0].colors[0].swatch} />
-        <ProductVisual variant="risers" tone={products[2].colors[1].swatch} />
-        <ProductVisual variant="nameplate" tone={products[4].colors[1].swatch} />
+        <ProductVisual variant={products[0].variant} tone={products[0].colors[0].swatch} />
+        <ProductVisual variant={products[2].variant} tone={products[2].colors[1].swatch} />
+        <ProductVisual variant={products[4].variant} tone={products[4].colors[1].swatch} />
       </div>
       <div className="hero-specimen float-card">
         <span>Studio collection</span>
-        <strong>Vessel, desk dock, risers, key rail, and nameplate</strong>
+        <strong>QR cards, ornaments, door hangers, luggage tags, and nameplate stands</strong>
       </div>
     </section>
   );
@@ -387,9 +407,9 @@ function StudioCallout() {
   return (
     <section className="studio-callout">
       <div className="object-wall" aria-hidden="true">
-        <ProductVisual variant="rail" tone={products[3].colors[2].swatch} />
-        <ProductVisual variant="dock" tone={products[1].colors[0].swatch} />
-        <ProductVisual variant="vessel" tone={products[0].colors[2].swatch} />
+        <ProductVisual variant={products[3].variant} tone={products[3].colors[2].swatch} />
+        <ProductVisual variant={products[1].variant} tone={products[1].colors[0].swatch} />
+        <ProductVisual variant={products[0].variant} tone={products[0].colors[2].swatch} />
       </div>
       <div className="studio-panel reveal">
         <p className="eyebrow">Small studio, precise output</p>
@@ -505,9 +525,9 @@ function Studio() {
     >
       <section className="about-layout">
         <div className="about-image reveal" aria-hidden="true">
-          <ProductVisual variant="dock" tone={products[1].colors[0].swatch} />
-          <ProductVisual variant="vessel" tone={products[0].colors[0].swatch} />
-          <ProductVisual variant="rail" tone={products[3].colors[2].swatch} />
+          <ProductVisual variant={products[1].variant} tone={products[1].colors[0].swatch} />
+          <ProductVisual variant={products[0].variant} tone={products[0].colors[0].swatch} />
+          <ProductVisual variant={products[3].variant} tone={products[3].colors[2].swatch} />
         </div>
         <div className="about-copy reveal">
           <h2>Not a generic shop. Not an open-ended fabrication desk.</h2>
@@ -581,7 +601,7 @@ function ProductCard({ product }) {
         <h3>{product.title}</h3>
       </div>
       <div className="catalog-media">
-        <ProductVisual variant={product.variant} tone={selectedColor.swatch} />
+        <ProductMedia product={product} selectedColor={selectedColor} imageIndex={0} />
       </div>
       <div className="catalog-specs">
         <div>
@@ -636,12 +656,18 @@ function ProductDetailContent({ product }) {
   const [selectedColorName, setSelectedColorName] = useState(product.colors[0].name);
   const selectedColor = product.colors.find((color) => color.name === selectedColorName) ?? product.colors[0];
   const [selectedMaterial, setSelectedMaterial] = useState(selectedColor.materials[0]);
+  const hasProductPhotos = product.imageUrls?.length > 0;
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     if (!selectedColor.materials.includes(selectedMaterial)) {
       setSelectedMaterial(selectedColor.materials[0]);
     }
   }, [selectedColor, selectedMaterial]);
+
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [product.slug]);
 
   return (
     <section className="product-detail-page">
@@ -654,21 +680,33 @@ function ProductDetailContent({ product }) {
       </nav>
       <div className="detail-layout">
         <aside className="detail-thumbs" aria-label={`${product.title} views`}>
-          {[product.colors[0], product.colors[1], product.colors[2], selectedColor].filter(Boolean).map((color, index) => (
-            <button
-              className={color.name === selectedColor.name ? 'is-active' : ''}
-              key={`${color.name}-${index}`}
-              type="button"
-              onClick={() => setSelectedColorName(color.name)}
-              aria-label={`View ${product.title} in ${color.name}`}
-            >
-              <ProductVisual variant={product.variant} tone={color.swatch} />
-            </button>
-          ))}
+          {hasProductPhotos
+            ? product.imageUrls.map((imageUrl, index) => (
+                <button
+                  className={selectedImageIndex === index ? 'is-active' : ''}
+                  key={imageUrl}
+                  type="button"
+                  onClick={() => setSelectedImageIndex(index)}
+                  aria-label={`View ${product.title} photo ${index + 1}`}
+                >
+                  <img src={imageUrl} alt="" loading="lazy" />
+                </button>
+              ))
+            : [product.colors[0], product.colors[1], product.colors[2], selectedColor].filter(Boolean).map((color, index) => (
+                <button
+                  className={color.name === selectedColor.name ? 'is-active' : ''}
+                  key={`${color.name}-${index}`}
+                  type="button"
+                  onClick={() => setSelectedColorName(color.name)}
+                  aria-label={`View ${product.title} in ${color.name}`}
+                >
+                  <ProductVisual variant={product.variant} tone={color.swatch} />
+                </button>
+              ))}
         </aside>
         <section className="detail-gallery">
-          <ProductVisual variant={product.variant} tone={selectedColor.swatch} />
-          <span>Selected finish: {selectedColor.name}</span>
+          <ProductMedia product={product} selectedColor={selectedColor} imageIndex={selectedImageIndex} />
+          <span>{hasProductPhotos ? `Reference photo ${selectedImageIndex + 1}` : `Selected finish: ${selectedColor.name}`}</span>
         </section>
         <section className="detail-main">
           <p className="eyebrow">{product.category}</p>
@@ -708,6 +746,9 @@ function ProductDetailContent({ product }) {
               </span>
             ))}
           </div>
+          <a className="reference-link" href={product.sourceUrl} target="_blank" rel="noreferrer">
+            View reference model <ArrowRight size={16} />
+          </a>
         </section>
         <aside className="detail-buybox">
           <div className="buybox-price">
@@ -753,6 +794,23 @@ function ProductDetailContent({ product }) {
       </div>
     </section>
   );
+}
+
+function ProductMedia({ product, selectedColor, imageIndex = 0 }) {
+  const imageUrl = product.imageUrls?.[imageIndex] ?? product.imageUrls?.[0];
+
+  if (imageUrl) {
+    return (
+      <img
+        className="product-photo"
+        src={imageUrl}
+        alt={`${product.title} sample print`}
+        loading="lazy"
+      />
+    );
+  }
+
+  return <ProductVisual variant={product.variant} tone={selectedColor.swatch} />;
 }
 
 function FilterGroup({ icon, title, options, active, counts, onSelect }) {
