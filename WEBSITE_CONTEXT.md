@@ -4,7 +4,7 @@ This document is intended to give an AI model enough context to understand, main
 
 ## Project Summary
 
-Gadjit Prints is a modern premium website for a small custom 3D printing studio. The current business direction is not an open-ended fabrication service where visitors can request anything. Instead, the studio offers a curated catalog of five configurable sample products. Customers choose from available product designs, then configure color and material options that the studio supports.
+Gadjit Prints is a modern premium website for a small configurable 3D printing service. The current business direction is an expandable product catalog where customers choose an available print, then configure supported colors, materials, text, QR codes, labels, sizing, and product-specific content options.
 
 The website should feel cinematic, refined, tactile, and artisan. It should communicate made-to-order care and material awareness without becoming a generic ecommerce template, a mass-market tech store, or a technical 3D printer showcase.
 
@@ -14,7 +14,7 @@ The user specifically does not want imagery of 3D printer machines. Visuals shou
 
 The brand personality is:
 
-- Bespoke but bounded: curated products, not unlimited custom work.
+- Personal but practical: configurable products that are easy to order and made after selection.
 - Artisan and premium: careful, tactile, considered.
 - Modern fabrication with warmth: digital precision softened by handcrafted presentation.
 - Calm and confident: no aggressive sales copy, no corporate tone.
@@ -41,7 +41,7 @@ Avoid:
 
 ## Current Product Strategy
 
-The website currently centers on five configurable products sourced from MakerWorld reference models:
+The website currently has several configurable products sourced from MakerWorld reference models. The catalog is expected to grow, so no product count should be treated as special in the UI or copy.
 
 1. QR Business Card
    - Slug: `qr-business-card`
@@ -73,7 +73,7 @@ The website currently centers on five configurable products sourced from MakerWo
    - Category: Business & Branding
    - Has real listing images.
 
-Each product supports a fixed set of color options. Each color has a subset of available materials, not every material in every color. This is important: the UI should communicate real inventory constraints instead of implying infinite customization.
+Each product supports a fixed set of color options. Each color has a subset of available materials, not every material in every color. Products may also support configurable content such as names, initials, QR destinations, labels, phrases, icons, sizing, mounting, or layouts. This is important: the UI should communicate real option constraints instead of implying infinite customization.
 
 ## Materials Model
 
@@ -121,7 +121,7 @@ Routes:
 
 - `/`
   - Homepage.
-  - Cinematic hero, curated studio positioning, featured products, process/material/category sections.
+  - Cinematic hero, configurable service positioning, featured products, process/material/category sections.
 
 - `/collection`
   - Main products page.
@@ -136,7 +136,7 @@ Routes:
 
 - `/process`
   - Process page.
-  - Explains the limited curated made-to-order workflow.
+  - Explains the configurable made-to-order workflow.
 
 - `/studio`
   - About/studio page.
@@ -369,7 +369,7 @@ http://127.0.0.1:5173
 - Product data is hardcoded in React.
 - No real purchase, cart, quote, or inquiry flow exists yet.
 - Configure buttons lead to product detail pages, but the final `Configure selection` button does not submit anywhere.
-- Two products, Initial Ornament & Name and Custom Door Hanger, still use CSS fallback visuals because automated access to their MakerWorld images was blocked.
+- Some product images are stored locally in `public/products`, while others still use externally hosted reference images.
 - Real image URLs are externally hosted. For production reliability, it may be better to download, license-check, optimize, and serve images from the project or a dedicated asset host.
 - There is no automated test suite.
 - Accessibility is considered in button labels and semantic structure, but a full accessibility audit has not been performed.
@@ -378,7 +378,7 @@ http://127.0.0.1:5173
 
 When modifying this project, preserve these principles:
 
-- Keep the catalog curated around concrete products, not unlimited custom fabrication.
+- Keep the catalog expandable and product-based, with clear configurable options for each item.
 - Do not reintroduce quote forms unless explicitly requested.
 - Do not add project type dropdowns.
 - Do not add heart/share buttons to listing cards.
@@ -394,7 +394,7 @@ When modifying this project, preserve these principles:
 
 High-value next steps:
 
-- Add local optimized images for all five products.
+- Add local optimized images for all products.
 - Add a non-dropdown product expansion pattern for future designs, such as category filter chips or searchable product cards.
 - Make `Configure selection` open a lightweight inquiry modal or copy a prefilled email body.
 - Move `products`, `colorLibrary`, and `materialInfo` into separate data files when the catalog grows.

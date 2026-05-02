@@ -113,7 +113,7 @@ const products = [
     category: 'Signs & Labels',
     variant: 'door-hanger',
     sourceUrl: 'https://makerworld.com/en/models/2737514-customizable-door-hanger-text-svg-emoji-support#profileId-3035138',
-    imageUrls: [],
+    imageUrls: ['/products/custom-door-hanger.png'],
     copy: 'A customizable door hanger with text, SVG, or emoji-style artwork support for rooms, studios, and events.',
     colors: ['Charcoal', 'Bone', 'Moss', 'Sand'].map((name) => ({ name, ...colorLibrary[name] })),
     config: ['Front text', 'Icon or SVG', 'Single or two-tone'],
@@ -166,13 +166,13 @@ const products = [
   },
 ];
 
-const categories = ['Five studio products', 'Color choices', 'Configured options', 'Made to order', 'Small-batch finish', 'Personal details'];
+const categories = ['Configurable products', 'Color choices', 'Custom text', 'Made to order', 'Small-batch finish', 'Personal details'];
 
 const processSteps = [
   {
     step: '01',
     title: 'Choose a Product',
-    text: 'Start with one of the five studio pieces, then choose the color family, finish direction, and available configuration.',
+    text: 'Start with a product from the catalog, then choose the color family, finish direction, and available content options.',
   },
   {
     step: '02',
@@ -195,7 +195,7 @@ const materials = [
   'PLA: affordable, clean, decorative',
   'PETG: stronger, tougher, functional',
   'ABS: sun and heat friendly',
-  'Curated color availability',
+  'Available color ranges',
   'Matte and satin finishes',
   'Made after selection',
 ];
@@ -275,35 +275,43 @@ function Home() {
   );
 }
 
+function getRandomProducts(count) {
+  return [...products]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, count);
+}
+
 function Hero() {
+  const [heroProducts] = useState(() => getRandomProducts(3));
+
   return (
     <section className="hero">
       <div className="hero-media" />
       <div className="hero-veil" />
       <div className="hero-content reveal">
-        <p className="eyebrow">Five configurable studio objects, printed to order</p>
-        <h1>Choose the piece. Tune the color. Make it yours.</h1>
+        <p className="eyebrow">Configurable 3D printed goods, made to order</p>
+        <h1>Pick a print. Choose the finish. Personalize the details.</h1>
         <p className="hero-copy">
-          Gadjit Prints offers a focused collection of 3D printed home, desk, and gift objects that can be customized
-          through curated colorways, layouts, labels, inserts, and finish details.
+          Gadjit Prints makes practical, giftable, and display-ready 3D printed products that can be configured through
+          available colors, materials, names, QR codes, labels, and layout details.
         </p>
         <div className="hero-actions">
           <NavLink className="button button-primary" to="/collection">
             Browse products <ArrowRight size={18} />
           </NavLink>
           <NavLink className="button button-ghost" to="/collection">
-            View the five pieces <ChevronRight size={18} />
+            See configurable prints <ChevronRight size={18} />
           </NavLink>
         </div>
       </div>
       <div className="hero-objects" aria-hidden="true">
-        <ProductVisual variant={products[0].variant} tone={products[0].colors[0].swatch} />
-        <ProductVisual variant={products[2].variant} tone={products[2].colors[1].swatch} />
-        <ProductVisual variant={products[4].variant} tone={products[4].colors[1].swatch} />
+        {heroProducts.map((product) => (
+          <ProductMedia key={product.slug} product={product} selectedColor={product.colors[0]} imageIndex={0} />
+        ))}
       </div>
       <div className="hero-specimen float-card">
-        <span>Studio collection</span>
-        <strong>QR cards, ornaments, door hangers, luggage tags, and nameplate stands</strong>
+        <span>Made to order</span>
+        <strong>Names, QR codes, colors, materials, signs, tags, gifts, and desk pieces</strong>
       </div>
     </section>
   );
@@ -313,9 +321,9 @@ function FeaturedWork() {
   return (
     <section className="section">
       <SectionIntro
-        label="The five products"
-        title="A tight collection, made personal through options."
-        copy="Instead of an open-ended catalog, each product starts from a studio-designed form and becomes yours through color, scale, layout, and detail choices."
+        label="Configurable products"
+        title="Useful printed pieces, personalized before production."
+        copy="Browse products that are ready to customize with available colors, materials, names, QR codes, labels, sizing, and layout details."
       />
       <div className="work-grid">
         {products.slice(0, 3).map((item, index) => (
@@ -352,10 +360,10 @@ function ProcessPreview() {
     <section className="section split-section">
       <div className="split-copy reveal">
         <p className="eyebrow">Configuration rhythm</p>
-        <h2>A focused ordering flow, not an anything-goes request box.</h2>
+        <h2>An easy path from product choice to finished print.</h2>
         <p>
-          You begin with a designed product, then choose from studio-approved colorways and configuration options so the
-          final object feels personal while staying refined.
+          You begin with a product, choose the available color and material, then add the content or layout details that
+          make the final print useful to you.
         </p>
         <NavLink className="text-link" to="/process">
           See the process <ArrowRight size={17} />
@@ -382,7 +390,7 @@ function Materials() {
       <SectionIntro
         label="Surface and material"
         title="Matte, mineral, satin, translucent, structural."
-        copy="Each product is offered in a curated finish range, so color and material feel intentional rather than random."
+        copy="Each product shows the colors and materials currently available, so customers can configure with real options instead of guessing."
       />
       <div className="material-grid">
         {materials.map((material) => {
@@ -413,10 +421,10 @@ function StudioCallout() {
       </div>
       <div className="studio-panel reveal">
         <p className="eyebrow">Small studio, precise output</p>
-        <h2>Designed products with room for your choices.</h2>
+        <h2>Configurable prints without the complicated ordering process.</h2>
         <p>
-          The studio keeps the collection intentionally small so every option can be dialed in: color, layout, scale,
-          labels, inserts, and finish.
+          The catalog can grow over time, while each product keeps a clear set of choices: color, material, text, QR
+          codes, labels, sizing, and finish.
         </p>
         <NavLink className="button button-primary" to="/studio">
           About the studio <ArrowRight size={18} />
@@ -442,8 +450,8 @@ function Collection() {
   return (
     <PageFrame
       label="Products"
-      title="Configurable products, ready to tune."
-      copy="Browse the current studio designs, choose the available color and material on each card, then use Configure when you are ready to shape the details."
+      title="Configurable 3D prints, ready to personalize."
+      copy="Browse available products, choose the color and material on each card, then use Configure when you are ready to add names, QR codes, labels, sizing, or layout details."
     >
       <div className="catalog-shell">
         <aside className="catalog-filters">
@@ -493,8 +501,8 @@ function Process() {
   return (
     <PageFrame
       label="Configuration process"
-      title="A careful path from product choice to finished object."
-      copy="The process keeps creative control with the studio while giving customers meaningful choices in color, configuration, labeling, and finish."
+      title="A simple path from product choice to finished print."
+      copy="Pick a product, choose from the available color and material options, add the configurable content, and the studio checks the details before printing."
     >
       <div className="timeline">
         {processSteps.map((step) => (
@@ -508,9 +516,9 @@ function Process() {
         ))}
       </div>
       <div className="note-grid">
-        <Note icon={<PenTool />} title="Curated choices" text="Customers pick from approved options, so every piece stays within the studio's design language." />
-        <Note icon={<Layers3 />} title="Configuration by product" text="Each object has its own adjustable details: layouts, hooks, trays, labels, sizing, or set count." />
-        <Note icon={<Check />} title="Made after selection" text="Products are printed after the configuration is selected, keeping the work personal without becoming fully bespoke." />
+        <Note icon={<PenTool />} title="Content options" text="Products can support names, initials, QR codes, labels, phrases, icons, or other product-specific details." />
+        <Note icon={<Layers3 />} title="Configuration by product" text="Each item has its own adjustable details: layouts, hooks, tags, signs, labels, sizing, mounting, or set count." />
+        <Note icon={<Check />} title="Made after selection" text="Products are printed after the configuration is selected, so each order is produced for the customer." />
       </div>
     </PageFrame>
   );
@@ -520,8 +528,8 @@ function Studio() {
   return (
     <PageFrame
       label="About the studio"
-      title="A small product studio for configurable printed goods."
-      copy="Gadjit Prints is built around a focused set of original products that can be personalized through tasteful, controlled options."
+      title="A small print studio for configurable everyday goods."
+      copy="Gadjit Prints builds practical, personal 3D printed products that can be adjusted through color, material, text, QR codes, and product-specific options."
     >
       <section className="about-layout">
         <div className="about-image reveal" aria-hidden="true">
@@ -530,14 +538,14 @@ function Studio() {
           <ProductVisual variant={products[3].variant} tone={products[3].colors[2].swatch} />
         </div>
         <div className="about-copy reveal">
-          <h2>Not a generic shop. Not an open-ended fabrication desk.</h2>
+          <h2>Easy to order, still made with care.</h2>
           <p>
-            The studio designs a small collection first, then lets each piece be shaped through finish and configuration.
-            That balance keeps the work intentional, repeatable, and still personal.
+            The studio creates products that are simple to browse and configure, then prints each order after the selected
+            color, material, and content details are set.
           </p>
           <p>
-            Each product is treated like a designed object with boundaries: a defined form, a curated palette, and a set
-            of options that make sense for how it will be used.
+            As more products are added, the goal stays the same: clear options, dependable materials, clean finishes, and
+            a result that feels made for the person ordering it.
           </p>
           <div className="value-list">
             <span>Measured precision</span>
@@ -967,7 +975,7 @@ function Footer() {
     <footer className="footer">
       <div>
         <strong>Gadjit Prints</strong>
-        <p>Five configurable 3D printed products, made to order in curated colors and finishes.</p>
+        <p>Configurable 3D printed products, made to order in available colors, materials, and personal details.</p>
       </div>
       <NavLink className="text-link" to="/collection">
         Browse products <ArrowRight size={17} />
