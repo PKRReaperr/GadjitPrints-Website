@@ -28,6 +28,9 @@ const navItems = [
   { to: '/studio', label: 'Studio' },
 ];
 
+const studioEmail = 'hello@gadjitprints.store';
+const brandLogo = '/brand/gadjitprints-logo.webp';
+
 const materialInfo = {
   PLA: {
     title: 'PLA',
@@ -50,24 +53,40 @@ const materialInfo = {
 };
 
 const colorLibrary = {
-  Bone: { swatch: '#e8ddca', materials: ['PLA', 'PETG'] },
-  Charcoal: { swatch: '#24211d', materials: ['PLA', 'PETG', 'ABS'] },
-  Clay: { swatch: '#b46f4d', materials: ['PLA'] },
-  Smoke: { swatch: '#77736a', materials: ['PLA', 'PETG'] },
-  Graphite: { swatch: '#343434', materials: ['PLA', 'PETG', 'ABS'] },
-  Stone: { swatch: '#a59c8d', materials: ['PLA', 'PETG'] },
-  Amber: { swatch: '#c89652', materials: ['PLA'] },
-  Olive: { swatch: '#5d6448', materials: ['PLA', 'PETG'] },
-  'Satin black': { swatch: '#11100e', materials: ['PLA', 'PETG', 'ABS'] },
-  Mist: { swatch: '#c7cbc2', materials: ['PLA'] },
-  'Warm gray': { swatch: '#8b8377', materials: ['PLA', 'PETG'] },
-  Moss: { swatch: '#4d5d47', materials: ['PETG', 'ABS'] },
-  Sand: { swatch: '#c3ae8d', materials: ['PLA', 'PETG'] },
-  'Bone on charcoal': { swatch: '#d9cfbd', materials: ['PLA'] },
-  'Amber on black': { swatch: '#c89652', materials: ['PLA', 'PETG'] },
-  'Clay on stone': { swatch: '#a56a52', materials: ['PLA'] },
-  'White on smoke': { swatch: '#e9e5da', materials: ['PLA', 'PETG'] },
+  'PLA Silk hot pink': {
+    swatch: '#ff4faf',
+    swatchStyle: 'linear-gradient(135deg, #ff9bd4, #ff4faf 48%, #b71374)',
+    materials: ['PLA'],
+  },
+  'PLA Silk purple': {
+    swatch: '#8d50d8',
+    swatchStyle: 'linear-gradient(135deg, #c6a0ff, #8d50d8 52%, #4b238f)',
+    materials: ['PLA'],
+  },
+  'PLA orange': { swatch: '#f47a24', materials: ['PLA'] },
+  'PLA Glow blue': {
+    swatch: '#7ad8ff',
+    swatchStyle: 'radial-gradient(circle at 35% 30%, #e8fbff, #7ad8ff 52%, #2f83bb)',
+    materials: ['PLA'],
+    priceAdd: 5,
+    priceNote: 'Glow PLA +$5',
+  },
+  'PLA green': { swatch: '#32a852', materials: ['PLA'] },
+  'PLA blue': { swatch: '#2466e8', materials: ['PLA'] },
+  'PLA red': { swatch: '#d6292f', materials: ['PLA'] },
+  'PLA white': { swatch: '#f5f1e8', materials: ['PLA'] },
+  'PLA black': { swatch: '#11100e', materials: ['PLA'] },
+  'PLA galaxy black': {
+    swatch: '#17171c',
+    swatchStyle: 'radial-gradient(circle at 30% 28%, #d6d0ff 0 2px, transparent 3px), radial-gradient(circle at 66% 62%, #9bdcff 0 1px, transparent 3px), linear-gradient(135deg, #2d2d38, #111117)',
+    materials: ['PLA'],
+    priceAdd: 4,
+    priceNote: 'Galaxy PLA +$4',
+  },
 };
+
+const plaColorNames = Object.keys(colorLibrary);
+const plaColors = plaColorNames.map((name) => ({ name, ...colorLibrary[name] }));
 
 const products = [
   {
@@ -82,7 +101,7 @@ const products = [
       'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUSa79b282bc488cd%2Fdesign%2Fbe65cd04b4540925.jpg&w=828',
     ],
     copy: 'A rigid printed business card with raised text, a scannable QR area, and a clean pocketable profile.',
-    colors: ['Bone', 'Charcoal', 'Amber', 'Stone'].map((name) => ({ name, ...colorLibrary[name] })),
+    colors: plaColors,
     config: ['Name and title', 'QR destination', 'Logo or small icon'],
     price: 'From $18',
     leadTime: '2-4 studio days',
@@ -97,9 +116,10 @@ const products = [
     category: 'Ornaments & Gifts',
     variant: 'ornament',
     sourceUrl: 'https://makerworld.com/en/models/2740326-fully-customizable-initial-ornament-and-name#profileId-3038641',
+    customizeUrl: 'https://makerworld.com/en/makerlab/parametricModelMaker?designId=2740326&from=model_page&modelName=nombre-v3.scad&protected=true&unikey=a926126f-79e1-4363-aeeb-382ea6aede75',
     imageUrls: ['/products/initial-ornament-name.png'],
     copy: 'A personalized ornament built around a large initial, custom name text, and a finished hanging loop.',
-    colors: ['Bone', 'Clay', 'Amber', 'White on smoke'].map((name) => ({ name, ...colorLibrary[name] })),
+    colors: plaColors,
     config: ['Initial letter', 'Name text', 'Loop style'],
     price: 'From $16',
     leadTime: '2-4 studio days',
@@ -116,7 +136,7 @@ const products = [
     sourceUrl: 'https://makerworld.com/en/models/2737514-customizable-door-hanger-text-svg-emoji-support#profileId-3035138',
     imageUrls: ['/products/custom-door-hanger.png'],
     copy: 'A customizable door hanger with text, SVG, or emoji-style artwork support for rooms, studios, and events.',
-    colors: ['Charcoal', 'Bone', 'Moss', 'Sand'].map((name) => ({ name, ...colorLibrary[name] })),
+    colors: plaColors,
     config: ['Front text', 'Icon or SVG', 'Single or two-tone'],
     price: 'From $22',
     leadTime: '3-5 studio days',
@@ -136,7 +156,7 @@ const products = [
       'https://makerworld.bblmw.com/makerworld/model/USc7eb59bdce5c4b/design/2024-10-17_6e2de6ddb58ca.jpg?x-oss-process=image%2Fresize%2Cw_1000%2Fformat%2Cwebp',
     ],
     copy: 'A custom travel tag with a QR code, name field, and sturdy strap slot for luggage, backpacks, and gear bags.',
-    colors: ['Graphite', 'Amber', 'Olive', 'Mist'].map((name) => ({ name, ...colorLibrary[name] })),
+    colors: plaColors,
     config: ['QR destination', 'Name or handle', 'Tag size'],
     price: 'From $20',
     leadTime: '2-4 studio days',
@@ -157,7 +177,7 @@ const products = [
       'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2Ff50dbabe572c2658.jpg&w=828',
     ],
     copy: 'A configurable name plate with QR code support that can sit on a desk or mount to a wall.',
-    colors: ['Bone on charcoal', 'Amber on black', 'Clay on stone', 'White on smoke'].map((name) => ({ name, ...colorLibrary[name] })),
+    colors: plaColors,
     config: ['Display text', 'QR destination', 'Stand or wall mount'],
     price: 'From $26',
     leadTime: '3-5 studio days',
@@ -167,37 +187,37 @@ const products = [
   },
 ];
 
-const categories = ['Configurable products', 'Color choices', 'Custom text', 'Made to order', 'Small-batch finish', 'Personal details'];
+const categories = ['Made-to-order products', 'Color choices', 'Custom text', 'Studio review', 'Small-batch finish', 'Personal details'];
 
 const processSteps = [
   {
     step: '01',
     title: 'Choose a Product',
-    text: 'Start with a product from the catalog, then choose the color family, finish direction, and available content options.',
+    text: 'Start with a product from the catalog, then choose the available color, finish direction, and content options.',
   },
   {
     step: '02',
     title: 'Configure the Details',
-    text: 'Select the layout, size, hooks, inserts, labels, initials, or set count depending on the product.',
+    text: 'Select the layout, size, hooks, labels, initials, QR code, or set count depending on the product.',
   },
   {
     step: '03',
     title: 'Studio Review',
-    text: 'The configuration is checked for proportion, printability, and surface quality before production begins.',
+    text: 'The configuration is treated as an outline. Gadjit Prints reviews it, follows up with questions, and shares previews or details before the print is finalized.',
   },
   {
     step: '04',
     title: 'Print & Finish',
-    text: 'Your selected product is printed to order, cleaned up, and finished with the material character you chose.',
+    text: 'Your selected product is printed to order, checked, cleaned up, and finished with the material character you chose.',
   },
 ];
 
 const materials = [
-  'PLA: affordable, clean, decorative',
-  'PETG: stronger, tougher, functional',
-  'ABS: sun and heat friendly',
+  'PLA: standard color prints',
+  'Silk PLA: glossy hot pink and purple',
+  'Glow PLA: premium blue finish',
+  'Galaxy PLA: premium black finish',
   'Available color ranges',
-  'Matte and satin finishes',
   'Made after selection',
 ];
 
@@ -209,6 +229,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/collection" element={<Collection />} />
+          <Route path="/collection/:slug/configure" element={<ProductConfigure />} />
           <Route path="/collection/:slug" element={<ProductDetail />} />
           <Route path="/process" element={<Process />} />
           <Route path="/studio" element={<Studio />} />
@@ -237,10 +258,12 @@ function SiteShell({ children }) {
     <>
       <header className="site-header">
         <NavLink className="brand" to="/" onClick={() => setOpen(false)}>
-          <span className="brand-mark">GP</span>
+          <span className="brand-mark">
+            <img src={brandLogo} alt="" width="46" height="46" decoding="async" />
+          </span>
           <span>
             <strong>Gadjit Prints</strong>
-            <small>Configurable printed goods</small>
+            <small>Custom 3D printed goods</small>
           </span>
         </NavLink>
         <nav className={`nav ${open ? 'is-open' : ''}`}>
@@ -290,11 +313,11 @@ function Hero() {
       <div className="hero-media" />
       <div className="hero-veil" />
       <div className="hero-content reveal">
-        <p className="eyebrow">Configurable 3D printed goods, made to order</p>
+        <p className="eyebrow">Custom 3D prints, made to order</p>
         <h1>Pick a print. Choose the finish. Personalize the details.</h1>
         <p className="hero-copy">
-          Gadjit Prints makes practical, giftable, and display-ready 3D printed products that can be configured through
-          available colors, materials, names, QR codes, labels, and layout details.
+          Gadjit Prints makes practical, giftable, and display-ready pieces that can be customized through available
+          colors, materials, names, QR codes, labels, and layout details before they are printed.
         </p>
         <div className="hero-actions">
           <NavLink className="button button-primary" to="/collection">
@@ -309,7 +332,7 @@ function Hero() {
       </div>
       <div className="hero-specimen float-card">
         <span>Made to order</span>
-        <strong>Names, QR codes, colors, materials, signs, tags, gifts, and desk pieces</strong>
+        <strong>Names, QR codes, colors, signs, tags, gifts, and desk pieces, tuned before production</strong>
       </div>
     </section>
   );
@@ -324,9 +347,9 @@ function FeaturedWork() {
   return (
     <section className="section">
       <SectionIntro
-        label="Configurable products"
-        title="Useful printed pieces, personalized before production."
-        copy="Browse products that are ready to customize with available colors, materials, names, QR codes, labels, sizing, and layout details."
+        label="Made-to-order products"
+        title="Useful printed pieces, personalized before they are made."
+        copy="Browse products that can be adjusted with available colors, materials, names, QR codes, labels, sizing, and layout details. Nothing is treated like shelf stock."
       />
       <div className="product-carousel reveal">
         <div className="carousel-stage" key={selectedProduct.slug}>
@@ -392,10 +415,10 @@ function ProcessPreview() {
     <section className="section split-section">
       <div className="split-copy reveal">
         <p className="eyebrow">Configuration rhythm</p>
-        <h2>An easy path from product choice to finished print.</h2>
+        <h2>A slower, more careful path to the right print.</h2>
         <p>
-          You begin with a product, choose the available color and material, then add the content or layout details that
-          make the final print useful to you.
+          You begin with a product, choose the available color and material, then add the details that make it yours.
+          Gadjit Prints reviews the outline and follows up before production begins.
         </p>
         <NavLink className="text-link" to="/process">
           See the process <ArrowRight size={17} />
@@ -422,7 +445,7 @@ function Materials() {
       <SectionIntro
         label="Surface and material"
         title="Matte, mineral, satin, translucent, structural."
-        copy="Each product shows the colors and materials currently available, so customers can configure with real options instead of guessing."
+        copy="Each product shows the colors and materials currently available, so customers choose from real shop options instead of an endless, impossible color wheel."
       />
       <div className="material-grid">
         {materials.map((material) => {
@@ -452,11 +475,11 @@ function StudioCallout() {
         <ProductVisual variant={products[0].variant} tone={products[0].colors[2].swatch} />
       </div>
       <div className="studio-panel reveal">
-        <p className="eyebrow">Small studio, precise output</p>
-        <h2>Configurable prints without the complicated ordering process.</h2>
+        <p className="eyebrow">Small studio, careful output</p>
+        <h2>Custom prints without the complicated ordering process.</h2>
         <p>
-          The catalog can grow over time, while each product keeps a clear set of choices: color, material, text, QR
-          codes, labels, sizing, and finish.
+          The catalog can grow over time, while each order still gets reviewed, tuned, and printed around the details the
+          customer requested.
         </p>
         <NavLink className="button button-primary" to="/studio">
           About the studio <ArrowRight size={18} />
@@ -470,7 +493,7 @@ function Collection() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeMaterial, setActiveMaterial] = useState('All');
   const categories = ['All', ...new Set(products.map((product) => product.category))];
-  const materialFilters = ['All', ...Object.keys(materialInfo)];
+  const materialFilters = ['All', ...new Set(products.flatMap((product) => product.colors.flatMap((color) => color.materials)))];
   const filteredProducts = products.filter((product) => {
     const categoryMatch = activeCategory === 'All' || product.category === activeCategory;
     const materialMatch =
@@ -482,8 +505,8 @@ function Collection() {
   return (
     <PageFrame
       label="Products"
-      title="Configurable 3D prints, ready to personalize."
-      copy="Browse available products, choose the color and material on each card, then use Configure when you are ready to add names, QR codes, labels, sizing, or layout details."
+      title="Made-to-order 3D prints, ready to personalize."
+      copy="Browse available products, choose the color and material on each card, then use Configure to outline names, QR codes, labels, sizing, or layout details before the studio reviews the order."
     >
       <div className="catalog-shell">
         <aside className="catalog-filters">
@@ -533,8 +556,8 @@ function Process() {
   return (
     <PageFrame
       label="Configuration process"
-      title="A simple path from product choice to finished print."
-      copy="Pick a product, choose from the available color and material options, add the configurable content, and the studio checks the details before printing."
+      title="A careful path from product choice to approved print."
+      copy="Pick a product, choose from the available color and material options, add the configurable content, and expect a review before printing begins."
     >
       <div className="timeline">
         {processSteps.map((step) => (
@@ -550,7 +573,7 @@ function Process() {
       <div className="note-grid">
         <Note icon={<PenTool />} title="Content options" text="Products can support names, initials, QR codes, labels, phrases, icons, or other product-specific details." />
         <Note icon={<Layers3 />} title="Configuration by product" text="Each item has its own adjustable details: layouts, hooks, tags, signs, labels, sizing, mounting, or set count." />
-        <Note icon={<Check />} title="Made after selection" text="Products are printed after the configuration is selected, so each order is produced for the customer." />
+        <Note icon={<Check />} title="Made after selection" text="Orders are not pulled from a shelf. They are reviewed, printed, and finished after the customer sends the outline." />
       </div>
     </PageFrame>
   );
@@ -560,8 +583,8 @@ function Studio() {
   return (
     <PageFrame
       label="About the studio"
-      title="A small print studio for configurable everyday goods."
-      copy="Gadjit Prints builds practical, personal 3D printed products that can be adjusted through color, material, text, QR codes, and product-specific options."
+      title="A custom 3D printing service for personal, practical pieces."
+      copy="Gadjit Prints focuses on bespoke printed goods that can be configured, reviewed, and made after selection instead of pulled from generic shelf inventory."
     >
       <section className="about-layout">
         <div className="about-image reveal" aria-hidden="true">
@@ -570,20 +593,24 @@ function Studio() {
           <ProductVisual variant={products[3].variant} tone={products[3].colors[2].swatch} />
         </div>
         <div className="about-copy reveal">
-          <h2>Easy to order, still made with care.</h2>
+          <h2>Not mass produced. Looked over, adjusted, and printed one order at a time.</h2>
           <p>
-            The studio creates products that are simple to browse and configure, then prints each order after the selected
-            color, material, and content details are set.
+            The studio exists to make custom 3D prints feel easier to order without losing the personal attention that
+            makes a made-to-order piece worthwhile.
           </p>
           <p>
-            As more products are added, the goal stays the same: clear options, dependable materials, clean finishes, and
-            a result that feels made for the person ordering it.
+            As a small Houston-area project, Gadjit Prints also has a quiet connection to <a className="text-link" href="https://gadjit.net" target="_blank" rel="noreferrer">Gadjit</a>,
+            a camera business with more than 10 years of experience around used and open-box camera gear.
+          </p>
+          <p>
+            Every print is made after the order is outlined, then checked and fine tuned before production. Wait times can
+            be longer than a mass-production shop, but the goal is a piece that looks and feels the way you wanted it.
           </p>
           <div className="value-list">
-            <span>Measured precision</span>
-            <span>Material sensitivity</span>
-            <span>Personal collaboration</span>
-            <span>Small-batch attention</span>
+            <span>Custom print service</span>
+            <span>Configurable details</span>
+            <span>Order-by-order finishing</span>
+            <span>Studio communication</span>
           </div>
         </div>
       </section>
@@ -650,7 +677,7 @@ function ProductCard({ product }) {
         </div>
         <div>
           <strong>Selected</strong>
-          <span>{selectedColor.name} / {selectedMaterial}</span>
+          <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
         </div>
       </div>
       <div className="catalog-options">
@@ -674,7 +701,7 @@ function ProductCard({ product }) {
           <span key={item}>{item}</span>
         ))}
       </div>
-      <NavLink className="configure-button" to={`/collection/${product.slug}`}>
+      <NavLink className="configure-button" to={`/collection/${product.slug}/configure`}>
         Configure
       </NavLink>
     </article>
@@ -729,7 +756,7 @@ function ProductDetailContent({ product }) {
                   onClick={() => setSelectedImageIndex(index)}
                   aria-label={`View ${product.title} photo ${index + 1}`}
                 >
-                  <img src={imageUrl} alt="" loading="lazy" />
+                  <img src={imageUrl} alt="" loading="lazy" decoding="async" />
                 </button>
               ))
             : [product.colors[0], product.colors[1], product.colors[2], selectedColor].filter(Boolean).map((color, index) => (
@@ -753,7 +780,7 @@ function ProductDetailContent({ product }) {
           <h1>{product.title}</h1>
           <p>{product.copy}</p>
           <div className="detail-rating">
-            <span>Studio configurable</span>
+            <span>Studio reviewed</span>
             <span>
               {[0, 1, 2, 3, 4].map((star) => (
                 <Star key={star} size={15} fill="currentColor" />
@@ -763,7 +790,7 @@ function ProductDetailContent({ product }) {
           <dl className="detail-spec-table">
             <div>
               <dt>Price</dt>
-              <dd>{product.price}</dd>
+              <dd>{getPriceDisplay(product, selectedColor)}</dd>
             </div>
             <div>
               <dt>Lead time</dt>
@@ -792,8 +819,8 @@ function ProductDetailContent({ product }) {
         </section>
         <aside className="detail-buybox">
           <div className="buybox-price">
-            <span>{product.price}</span>
-            <small>Made after selection</small>
+            <span>{getPriceDisplay(product, selectedColor)}</span>
+            <small>{selectedColor.priceNote ?? 'Made after selection'}</small>
           </div>
           <OptionGroup title="Color">
             <ColorSwatches colors={product.colors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
@@ -807,11 +834,11 @@ function ProductDetailContent({ product }) {
           </OptionGroup>
           <div className="buybox-selected">
             <strong>Current configuration</strong>
-            <span>{selectedColor.name} / {selectedMaterial}</span>
+            <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
           </div>
-          <button className="button button-primary" type="button">
+          <NavLink className="button button-primary" to={`/collection/${product.slug}/configure`}>
             Configure selection <ArrowRight size={17} />
-          </button>
+          </NavLink>
           <div className="buybox-notes">
             <span>
               <Truck size={16} />
@@ -819,11 +846,11 @@ function ProductDetailContent({ product }) {
             </span>
             <span>
               <Ruler size={16} />
-              Configuration checked before printing
+              Configuration reviewed before printing
             </span>
             <span>
               <RotateCcw size={16} />
-              Small adjustments confirmed by studio
+              Preview details confirmed by studio
             </span>
             <span>
               <Info size={16} />
@@ -832,6 +859,170 @@ function ProductDetailContent({ product }) {
           </div>
         </aside>
       </div>
+    </section>
+  );
+}
+
+function ProductConfigure() {
+  const { slug } = useParams();
+  const product = products.find((item) => item.slug === slug);
+
+  if (!product) {
+    return <Navigate to="/collection" replace />;
+  }
+
+  return <ProductConfigureContent product={product} />;
+}
+
+function ProductConfigureContent({ product }) {
+  const [selectedColorName, setSelectedColorName] = useState(product.colors[0].name);
+  const selectedColor = product.colors.find((color) => color.name === selectedColorName) ?? product.colors[0];
+  const selectedMaterial = selectedColor.materials[0];
+  const [form, setForm] = useState(() => getDefaultConfigureForm(product));
+  const [copied, setCopied] = useState(false);
+  const summary = getConfigurationSummary(product, selectedColor, selectedMaterial, form);
+  const emailHref = getConfigurationEmailHref(product, summary);
+
+  useEffect(() => {
+    setSelectedColorName(product.colors[0].name);
+    setForm(getDefaultConfigureForm(product));
+    setCopied(false);
+  }, [product]);
+
+  function updateField(field, value) {
+    setForm((current) => ({ ...current, [field]: value }));
+    setCopied(false);
+  }
+
+  async function copyConfiguration() {
+    await navigator.clipboard.writeText(summary);
+    setCopied(true);
+  }
+
+  return (
+    <section className="configure-page">
+      <nav className="crumbs" aria-label="Breadcrumb">
+        <NavLink to="/collection">Products</NavLink>
+        <ChevronRight size={14} />
+        <NavLink to={`/collection/${product.slug}`}>{product.title}</NavLink>
+        <ChevronRight size={14} />
+        <strong>Configure</strong>
+      </nav>
+      <div className="configure-layout">
+        <aside className="configure-preview">
+          <ProductMedia product={product} selectedColor={selectedColor} imageIndex={0} />
+          <div>
+            <p className="eyebrow">{product.category}</p>
+            <h1>{product.title}</h1>
+            <p>{product.copy}</p>
+          </div>
+          <div className="configure-preview-specs">
+            <span>{getPriceDisplay(product, selectedColor)}</span>
+            <span>{product.leadTime}</span>
+            <span>{product.dimensions}</span>
+          </div>
+        </aside>
+
+        <section className="configure-form-panel">
+          <ConfigureGroup title="Finish">
+            <ColorSwatches colors={product.colors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
+            <div className="buybox-selected">
+              <strong>Selected finish</strong>
+              <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
+            </div>
+          </ConfigureGroup>
+
+          <ConfigureGroup title="Personal details">
+            <label className="field-control">
+              <span>Main text</span>
+              <input value={form.mainText} onChange={(event) => updateField('mainText', event.target.value)} />
+            </label>
+            <label className="field-control">
+              <span>Secondary text</span>
+              <input value={form.secondaryText} onChange={(event) => updateField('secondaryText', event.target.value)} />
+            </label>
+            <label className="field-control">
+              <span>QR code link or content</span>
+              <input value={form.qrContent} onChange={(event) => updateField('qrContent', event.target.value)} placeholder="Website, profile, contact card, or message" />
+            </label>
+            <label className="field-control">
+              <span>Logo or file notes</span>
+              <input value={form.logoNotes} onChange={(event) => updateField('logoNotes', event.target.value)} placeholder="Describe logo, SVG, image, or file you will send" />
+            </label>
+          </ConfigureGroup>
+
+          <ConfigureGroup title="Size and layout">
+            <div className="segmented-row" aria-label="Layout style">
+              {['Standard', 'Compact', 'Large'].map((layout) => (
+                <button
+                  className={form.layout === layout ? 'is-active' : ''}
+                  key={layout}
+                  type="button"
+                  onClick={() => updateField('layout', layout)}
+                >
+                  {layout}
+                </button>
+              ))}
+            </div>
+            <label className="field-control">
+              <span>Requested size</span>
+              <input value={form.size} onChange={(event) => updateField('size', event.target.value)} placeholder="Example: 4 in wide, standard, larger tag" />
+            </label>
+            <label className="field-control">
+              <span>Notes for the studio</span>
+              <textarea value={form.notes} onChange={(event) => updateField('notes', event.target.value)} placeholder="Placement, spelling, deadline, gift notes, usage, or anything specific." />
+            </label>
+          </ConfigureGroup>
+
+          <ConfigureGroup title="Contact">
+            <label className="field-control">
+              <span>Your name</span>
+              <input value={form.customerName} onChange={(event) => updateField('customerName', event.target.value)} />
+            </label>
+            <label className="field-control">
+              <span>Your email or phone</span>
+              <input value={form.customerContact} onChange={(event) => updateField('customerContact', event.target.value)} />
+            </label>
+          </ConfigureGroup>
+        </section>
+
+        <aside className="configure-summary">
+          <p className="eyebrow">Ready to send</p>
+          <h2>Configuration summary</h2>
+          <div className="outline-disclaimer">
+            <strong>This is an outline, not the final print plan.</strong>
+            <span>
+              After you send it, the Gadjit Prints team will review the details, contact you about specifics, and share
+              previews or confirmation notes before production begins.
+            </span>
+          </div>
+          <pre>{summary}</pre>
+          <div className="configure-actions">
+            <a className="button button-primary" href={emailHref}>
+              Email configuration <ArrowRight size={17} />
+            </a>
+            <button className="button button-ghost" type="button" onClick={copyConfiguration}>
+              {copied ? 'Copied' : 'Copy summary'}
+            </button>
+            <a className="text-link" href={getCustomizeUrl(product)} target="_blank" rel="noreferrer">
+              Open MakerWorld reference <ArrowRight size={16} />
+            </a>
+          </div>
+          <p className="configure-note">
+            Email apps cannot attach logo files automatically. After the draft opens, attach any SVG, PNG, JPEG, or
+            reference file you want used. The studio may request additional files or changes after reviewing your outline.
+          </p>
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function ConfigureGroup({ title, children }) {
+  return (
+    <section className="configure-group">
+      <h2>{title}</h2>
+      {children}
     </section>
   );
 }
@@ -846,11 +1037,103 @@ function ProductMedia({ product, selectedColor, imageIndex = 0 }) {
         src={imageUrl}
         alt={`${product.title} sample print`}
         loading="lazy"
+        decoding="async"
       />
     );
   }
 
   return <ProductVisual variant={product.variant} tone={selectedColor.swatch} />;
+}
+
+function getPriceDisplay(product, selectedColor) {
+  return selectedColor.priceAdd ? `${product.price} + $${selectedColor.priceAdd}` : product.price;
+}
+
+function getCustomizeUrl(product) {
+  return product.customizeUrl ?? product.sourceUrl;
+}
+
+function getDefaultConfigureForm(product) {
+  const defaults = {
+    'qr-business-card': {
+      mainText: 'Your Name',
+      secondaryText: 'Title or business name',
+      qrContent: 'Website or contact link',
+      size: 'Standard card size',
+    },
+    'initial-ornament-name': {
+      mainText: 'Sofia',
+      secondaryText: 'S',
+      qrContent: '',
+      size: 'Standard ornament size',
+    },
+    'custom-door-hanger': {
+      mainText: 'Do Not Disturb',
+      secondaryText: 'Custom lower text',
+      qrContent: '',
+      size: 'Standard door hanger',
+    },
+    'qr-luggage-bag-tag': {
+      mainText: 'Name or handle',
+      secondaryText: 'Return if found',
+      qrContent: 'Contact or luggage profile link',
+      size: 'Medium tag',
+    },
+    'qr-nameplate-stand': {
+      mainText: 'Display name',
+      secondaryText: 'Title or handle',
+      qrContent: 'Profile, menu, portfolio, or contact link',
+      size: 'Standard desktop stand',
+    },
+  };
+
+  return {
+    mainText: defaults[product.slug]?.mainText ?? '',
+    secondaryText: defaults[product.slug]?.secondaryText ?? '',
+    qrContent: defaults[product.slug]?.qrContent ?? '',
+    logoNotes: '',
+    layout: 'Standard',
+    size: defaults[product.slug]?.size ?? '',
+    notes: '',
+    customerName: '',
+    customerContact: '',
+  };
+}
+
+function getConfigurationSummary(product, selectedColor, selectedMaterial, form) {
+  return [
+    'NOTE: This configuration is an outline, not the final print plan.',
+    'Gadjit Prints will review it, communicate about specifics, and send previews or confirmation details before production.',
+    '',
+    `Product: ${product.title}`,
+    `Category: ${product.category}`,
+    `Estimated price: ${getPriceDisplay(product, selectedColor)}`,
+    `Color: ${selectedColor.name}`,
+    `Material: ${selectedMaterial}`,
+    `Premium finish: ${selectedColor.priceNote ?? 'None'}`,
+    `Main text: ${form.mainText || 'Not provided'}`,
+    `Secondary text: ${form.secondaryText || 'Not provided'}`,
+    `QR code content: ${form.qrContent || 'Not provided'}`,
+    `Logo/file notes: ${form.logoNotes || 'None'}`,
+    `Layout: ${form.layout}`,
+    `Requested size: ${form.size || 'Not provided'}`,
+    `Studio notes: ${form.notes || 'None'}`,
+    `Customer name: ${form.customerName || 'Not provided'}`,
+    `Customer contact: ${form.customerContact || 'Not provided'}`,
+    `Reference model: ${product.sourceUrl}`,
+  ].join('\n');
+}
+
+function getConfigurationEmailHref(product, summary) {
+  const subject = encodeURIComponent(`Gadjit Prints configuration: ${product.title}`);
+  const body = encodeURIComponent(`${summary}\n\nPlease attach any logo, SVG, image, or reference files before sending.`);
+  return `mailto:${studioEmail}?subject=${subject}&body=${body}`;
+}
+
+function getConfigurationLabel(selectedColor, selectedMaterial) {
+  return selectedColor.priceAdd
+    ? `${selectedColor.name} / ${selectedMaterial} (+$${selectedColor.priceAdd})`
+    : `${selectedColor.name} / ${selectedMaterial}`;
 }
 
 function FilterGroup({ icon, title, options, active, counts, onSelect }) {
@@ -869,7 +1152,7 @@ function FilterGroup({ icon, title, options, active, counts, onSelect }) {
             onClick={() => onSelect(option)}
           >
             <span>{option}</span>
-            <strong>{counts[option] ?? products.length}</strong>
+            <strong>{counts[option] ?? 0}</strong>
           </button>
         ))}
       </div>
@@ -922,8 +1205,11 @@ function ColorSwatches({ colors, selectedColor, onSelectColor }) {
           onClick={() => onSelectColor(color.name)}
           aria-pressed={selectedColor === color.name}
         >
-          <span style={{ background: color.swatch }} />
-          <small>{color.name}</small>
+          <span style={{ background: color.swatchStyle ?? color.swatch }} />
+          <small>
+            {color.name}
+            {color.priceAdd ? <em>+${color.priceAdd}</em> : null}
+          </small>
         </button>
       ))}
     </div>
@@ -933,7 +1219,7 @@ function ColorSwatches({ colors, selectedColor, onSelectColor }) {
 function MaterialChoices({ available, selectedMaterial, onSelectMaterial }) {
   return (
     <div className="material-choice-row">
-      {Object.keys(materialInfo).map((material) => (
+      {Object.keys(materialInfo).filter((material) => available.includes(material)).map((material) => (
         <MaterialBadge
           key={material}
           material={material}
@@ -976,7 +1262,7 @@ function ProductOptions({ product, selectedColor, selectedMaterial }) {
       <div>
         <strong>Selected</strong>
         <p>
-          {selectedColor.name} / {selectedMaterial}
+          {getConfigurationLabel(selectedColor, selectedMaterial)}
         </p>
       </div>
       <div>
@@ -1005,9 +1291,14 @@ function ProductVisual({ variant, tone = '#d8d0c1' }) {
 function Footer() {
   return (
     <footer className="footer">
-      <div>
-        <strong>Gadjit Prints</strong>
-        <p>Configurable 3D printed products, made to order in available colors, materials, and personal details.</p>
+      <div className="footer-brand">
+        <span className="footer-mark">
+          <img src={brandLogo} alt="" width="48" height="48" loading="lazy" decoding="async" />
+        </span>
+        <div>
+          <strong>Gadjit Prints</strong>
+          <p>Custom 3D printed products, reviewed and tuned before production.</p>
+        </div>
       </div>
       <NavLink className="text-link" to="/collection">
         Browse products <ArrowRight size={17} />

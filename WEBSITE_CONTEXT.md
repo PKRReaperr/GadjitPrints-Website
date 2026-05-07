@@ -4,9 +4,11 @@ This document is intended to give an AI model enough context to understand, main
 
 ## Project Summary
 
-Gadjit Prints is a modern premium website for a small configurable 3D printing service. The current business direction is an expandable product catalog where customers choose an available print, then configure supported colors, materials, text, QR codes, labels, sizing, and product-specific content options.
+Gadjit Prints is a modern premium website for a custom 3D printing service. The current business direction is an expandable product catalog where customers choose an available print, then configure supported colors, materials, text, QR codes, labels, sizing, and product-specific content options.
 
-The website should feel cinematic, refined, tactile, and artisan. It should communicate made-to-order care and material awareness without becoming a generic ecommerce template, a mass-market tech store, or a technical 3D printer showcase.
+The Houston-area and Gadjit connection should only appear as a small About-page note. Gadjit Prints has a quiet connection to Gadjit, a camera business with more than 10 years of experience around used and open-box camera gear, but that should not be the main site positioning. The primary message is custom 3D printing.
+
+The website should feel cinematic, refined, tactile, and artisan. It should communicate made-to-order care, custom 3D print accessibility, and material awareness without becoming a generic ecommerce template, a mass-market tech store, or a technical 3D printer showcase.
 
 The user specifically does not want imagery of 3D printer machines. Visuals should focus on finished printed objects, simple atmospheric product backgrounds, and polished presentation.
 
@@ -19,11 +21,15 @@ The brand personality is:
 - Modern fabrication with warmth: digital precision softened by handcrafted presentation.
 - Calm and confident: no aggressive sales copy, no corporate tone.
 - Design-forward: editorial typography, generous spacing, dark atmospheric surfaces, subtle motion.
+- Small and honest: not mass produced, not instant, and not pretending every color or material is available.
+- Customer-aware: orders are reviewed, tuned, and communicated about before production.
+- Service-first: the main focus is a custom 3D printing service, not the parent-company or Houston origin story.
 
 The visual language should use:
 
 - Dark charcoal and smoke backgrounds.
 - Bone, stone, soft metal, muted amber, clay, moss, and warm neutral accents.
+- The black-and-white Gadjit Prints logo as a restrained inverse brand accent.
 - Refined typography with an editorial feel.
 - Soft shadows, layered depth, dimensional product cards.
 - Tactile hover states and smooth reveal animations.
@@ -34,6 +40,7 @@ Avoid:
 - Purple-heavy AI-style gradients.
 - Generic startup landing page patterns.
 - Generic ecommerce product grids that feel off-the-shelf.
+- Copy that implies mass production, instant fulfillment, or unlimited customization.
 - Dropdown-heavy configuration flows.
 - Open quote/request forms for now.
 - Heart/share buttons on product cards.
@@ -74,6 +81,8 @@ The website currently has several configurable products sourced from MakerWorld 
    - Has real listing images.
 
 Each product supports a fixed set of color options. Each color has a subset of available materials, not every material in every color. Products may also support configurable content such as names, initials, QR destinations, labels, phrases, icons, sizing, mounting, or layouts. This is important: the UI should communicate real option constraints instead of implying infinite customization.
+
+The catalog is not meant to feel like shelf inventory. Products are made after the customer outlines the configuration, and the studio should clearly communicate that previews, clarification, and longer wait times are part of the more careful ordering process.
 
 ## Materials Model
 
@@ -134,13 +143,19 @@ Routes:
   - Inspired by Amazon product detail layout, but not visually copied.
   - Includes breadcrumbs, thumbnail gallery, large product media area, product description, specs, available configuration, buybox-style configuration panel, and reference model link.
 
+- `/collection/:slug/configure`
+  - Lightweight product configuration page.
+  - Lets customers choose finish, enter text, QR content, logo/file notes, size/layout requests, studio notes, and contact details.
+  - Generates a configuration summary and opens a prefilled `mailto:` draft to the studio email.
+
 - `/process`
   - Process page.
-  - Explains the configurable made-to-order workflow.
+  - Explains the configurable made-to-order workflow, including studio review and communication before production.
 
 - `/studio`
   - About/studio page.
-  - Communicates small studio, careful printing, and refined configuration work.
+  - Communicates Gadjit Prints as a custom 3D printing service with careful printing, order-by-order finishing, and no mass-production positioning.
+  - May include a small shoutout to the Houston-area origin and Gadjit connection, but this should not dominate the page.
 
 - `/quote`
   - Currently redirects to `/collection`.
@@ -167,6 +182,12 @@ Primary source files:
 
 - `vercel.json`
   - Vercel build settings and SPA rewrite configuration.
+
+- `public/brand/gadjitprints-logo.webp`
+  - Optimized official Gadjit Prints logo used by the live UI. Use it in restrained brand moments such as the header, footer, or subtle watermark treatments.
+
+- `public/brand/gadjitprints-logo.png`
+  - Original larger source logo retained as a backup/source asset.
 
 Important components in `src/main.jsx`:
 
@@ -293,6 +314,8 @@ Potential future backend additions:
 - Inventory-aware material/color availability.
 - Image hosting pipeline.
 - Admin panel for adding new designs.
+- Parametric STL/3MF generation from customer configuration JSON and product source templates.
+- Local configuration pages that generate email-ready customer specs, with MakerWorld links kept as references for supported parametric products.
 
 ## Deployment Structure
 
@@ -368,7 +391,7 @@ http://127.0.0.1:5173
 
 - Product data is hardcoded in React.
 - No real purchase, cart, quote, or inquiry flow exists yet.
-- Configure buttons lead to product detail pages, but the final `Configure selection` button does not submit anywhere.
+- Configure buttons lead to `/collection/:slug/configure`, where customers can copy or email their specs.
 - Some product images are stored locally in `public/products`, while others still use externally hosted reference images.
 - Real image URLs are externally hosted. For production reliability, it may be better to download, license-check, optimize, and serve images from the project or a dedicated asset host.
 - There is no automated test suite.
@@ -384,6 +407,8 @@ When modifying this project, preserve these principles:
 - Do not add heart/share buttons to listing cards.
 - Do not add 3D printer machine imagery.
 - Keep visual tone dark, premium, warm, and tactile.
+- Keep copy grounded in the Gadjit Prints philosophy: custom 3D printing service, made after selection, not mass produced, longer wait times accepted for a more personal result.
+- Keep Houston and Gadjit references limited to the About section as a small supporting note.
 - Keep product cards listing-like, but aligned with the site color scheme.
 - Keep material/color constraints visible and honest.
 - Prefer reusable React components and local product data patterns already present.
@@ -396,7 +421,7 @@ High-value next steps:
 
 - Add local optimized images for all products.
 - Add a non-dropdown product expansion pattern for future designs, such as category filter chips or searchable product cards.
-- Make `Configure selection` open a lightweight inquiry modal or copy a prefilled email body.
+- Replace `studioEmail` in `src/main.jsx` with the final production inbox if different from the current value.
 - Move `products`, `colorLibrary`, and `materialInfo` into separate data files when the catalog grows.
 - Add basic analytics or Vercel Web Analytics.
 - Add a simple test or smoke check for all routes.
