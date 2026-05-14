@@ -88,6 +88,33 @@ const colorLibrary = {
 const plaColorNames = Object.keys(colorLibrary);
 const plaColors = plaColorNames.map((name) => ({ name, ...colorLibrary[name] }));
 
+const qrStandTemplates = {
+  Custom: {
+    topText: '',
+    bottomText: '',
+    qrContent: '',
+    bottomLogoNotes: '',
+  },
+  'Facebook Stand': {
+    topText: 'Follow Us!',
+    bottomText: 'Facebook',
+    qrContent: 'Facebook page link',
+    bottomLogoNotes: '',
+  },
+  'Zelle Stand': {
+    topText: 'Pay With Zelle',
+    bottomText: 'Scan to Pay',
+    qrContent: 'Zelle payment QR link or payment details',
+    bottomLogoNotes: '',
+  },
+  'Instagram Stand': {
+    topText: 'Follow Us!',
+    bottomText: 'Instagram',
+    qrContent: 'Instagram profile link',
+    bottomLogoNotes: '',
+  },
+};
+
 const products = [
   {
     slug: 'qr-business-card',
@@ -108,6 +135,28 @@ const products = [
     dimensions: 'Standard card footprint',
     finish: 'Flat two-tone detail',
     includes: ['QR code area', 'Custom name text', 'Optional logo mark'],
+  },
+  {
+    slug: 'qr-code-business-stand',
+    title: 'QR Code Business Stand',
+    type: 'In-house QR display stand',
+    category: 'Business & Branding',
+    variant: 'qr-plate',
+    badge: 'In-house design',
+    configureType: 'qr-stand',
+    imageUrls: [
+      '/products/qr-code-business-stand-hero.webp',
+      '/products/qr-code-business-stand-print-bed.webp',
+    ],
+    copy: 'A custom counter stand for QR payments, social follows, menus, contact links, booths, and small business displays.',
+    colors: plaColors,
+    config: ['Top text', 'QR color', 'Bottom text or logo', 'Rear ornament'],
+    price: 'From $35',
+    leadTime: '7-10 studio days',
+    dimensions: 'Countertop display scale',
+    finish: 'Multi-color raised QR display',
+    includes: ['In-house stand design', 'Custom text zones', 'QR code panel', 'Optional rear ornament'],
+    inHouseNote: 'Designed entirely in house by Gadjit Prints. The base plate, QR panel, text boxes, bottom logo area, and optional rear ornament can be tuned for each order.',
   },
   {
     slug: 'initial-ornament-name',
@@ -665,6 +714,7 @@ function ProductCard({ product }) {
   return (
     <article className="catalog-card reveal">
       <div className="catalog-card-title">
+        {product.badge ? <span className="product-badge">{product.badge}</span> : null}
         <h3>{product.title}</h3>
       </div>
       <div className="catalog-media">
@@ -779,6 +829,12 @@ function ProductDetailContent({ product }) {
           <p className="eyebrow">{product.category}</p>
           <h1>{product.title}</h1>
           <p>{product.copy}</p>
+          {product.inHouseNote ? (
+            <div className="detail-callout">
+              <strong>{product.badge}</strong>
+              <span>{product.inHouseNote}</span>
+            </div>
+          ) : null}
           <div className="detail-rating">
             <span>Studio reviewed</span>
             <span>
@@ -813,9 +869,11 @@ function ProductDetailContent({ product }) {
               </span>
             ))}
           </div>
-          <a className="reference-link" href={product.sourceUrl} target="_blank" rel="noreferrer">
-            View reference model <ArrowRight size={16} />
-          </a>
+          {product.sourceUrl ? (
+            <a className="reference-link" href={product.sourceUrl} target="_blank" rel="noreferrer">
+              View reference model <ArrowRight size={16} />
+            </a>
+          ) : null}
         </section>
         <aside className="detail-buybox">
           <div className="buybox-price">
@@ -924,55 +982,19 @@ function ProductConfigureContent({ product }) {
         </aside>
 
         <section className="configure-form-panel">
-          <ConfigureGroup title="Finish">
+          <ConfigureGroup title={product.configureType === 'qr-stand' ? 'Base plate color' : 'Finish'}>
             <ColorSwatches colors={product.colors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
             <div className="buybox-selected">
-              <strong>Selected finish</strong>
+              <strong>{product.configureType === 'qr-stand' ? 'Selected base plate' : 'Selected finish'}</strong>
               <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
             </div>
           </ConfigureGroup>
 
-          <ConfigureGroup title="Personal details">
-            <label className="field-control">
-              <span>Main text</span>
-              <input value={form.mainText} onChange={(event) => updateField('mainText', event.target.value)} />
-            </label>
-            <label className="field-control">
-              <span>Secondary text</span>
-              <input value={form.secondaryText} onChange={(event) => updateField('secondaryText', event.target.value)} />
-            </label>
-            <label className="field-control">
-              <span>QR code link or content</span>
-              <input value={form.qrContent} onChange={(event) => updateField('qrContent', event.target.value)} placeholder="Website, profile, contact card, or message" />
-            </label>
-            <label className="field-control">
-              <span>Logo or file notes</span>
-              <input value={form.logoNotes} onChange={(event) => updateField('logoNotes', event.target.value)} placeholder="Describe logo, SVG, image, or file you will send" />
-            </label>
-          </ConfigureGroup>
-
-          <ConfigureGroup title="Size and layout">
-            <div className="segmented-row" aria-label="Layout style">
-              {['Standard', 'Compact', 'Large'].map((layout) => (
-                <button
-                  className={form.layout === layout ? 'is-active' : ''}
-                  key={layout}
-                  type="button"
-                  onClick={() => updateField('layout', layout)}
-                >
-                  {layout}
-                </button>
-              ))}
-            </div>
-            <label className="field-control">
-              <span>Requested size</span>
-              <input value={form.size} onChange={(event) => updateField('size', event.target.value)} placeholder="Example: 4 in wide, standard, larger tag" />
-            </label>
-            <label className="field-control">
-              <span>Notes for the studio</span>
-              <textarea value={form.notes} onChange={(event) => updateField('notes', event.target.value)} placeholder="Placement, spelling, deadline, gift notes, usage, or anything specific." />
-            </label>
-          </ConfigureGroup>
+          {product.configureType === 'qr-stand' ? (
+            <QrStandConfigureFields form={form} updateField={updateField} />
+          ) : (
+            <GenericConfigureFields form={form} updateField={updateField} />
+          )}
 
           <ConfigureGroup title="Contact">
             <label className="field-control">
@@ -1004,9 +1026,11 @@ function ProductConfigureContent({ product }) {
             <button className="button button-ghost" type="button" onClick={copyConfiguration}>
               {copied ? 'Copied' : 'Copy summary'}
             </button>
-            <a className="text-link" href={getCustomizeUrl(product)} target="_blank" rel="noreferrer">
-              Open MakerWorld reference <ArrowRight size={16} />
-            </a>
+            {getCustomizeUrl(product) ? (
+              <a className="text-link" href={getCustomizeUrl(product)} target="_blank" rel="noreferrer">
+                Open MakerWorld reference <ArrowRight size={16} />
+              </a>
+            ) : null}
           </div>
           <p className="configure-note">
             Email apps cannot attach logo files automatically. After the draft opens, attach any SVG, PNG, JPEG, or
@@ -1015,6 +1039,142 @@ function ProductConfigureContent({ product }) {
         </aside>
       </div>
     </section>
+  );
+}
+
+function GenericConfigureFields({ form, updateField }) {
+  return (
+    <>
+      <ConfigureGroup title="Personal details">
+        <label className="field-control">
+          <span>Main text</span>
+          <input value={form.mainText} onChange={(event) => updateField('mainText', event.target.value)} />
+        </label>
+        <label className="field-control">
+          <span>Secondary text</span>
+          <input value={form.secondaryText} onChange={(event) => updateField('secondaryText', event.target.value)} />
+        </label>
+        <label className="field-control">
+          <span>QR code link or content</span>
+          <input value={form.qrContent} onChange={(event) => updateField('qrContent', event.target.value)} placeholder="Website, profile, contact card, or message" />
+        </label>
+        <label className="field-control">
+          <span>Logo or file notes</span>
+          <input value={form.logoNotes} onChange={(event) => updateField('logoNotes', event.target.value)} placeholder="Describe logo, SVG, image, or file you will send" />
+        </label>
+      </ConfigureGroup>
+
+      <ConfigureGroup title="Size and layout">
+        <div className="segmented-row" aria-label="Layout style">
+          {['Standard', 'Compact', 'Large'].map((layout) => (
+            <button
+              className={form.layout === layout ? 'is-active' : ''}
+              key={layout}
+              type="button"
+              onClick={() => updateField('layout', layout)}
+            >
+              {layout}
+            </button>
+          ))}
+        </div>
+        <label className="field-control">
+          <span>Requested size</span>
+          <input value={form.size} onChange={(event) => updateField('size', event.target.value)} placeholder="Example: 4 in wide, standard, larger tag" />
+        </label>
+        <label className="field-control">
+          <span>Notes for the studio</span>
+          <textarea value={form.notes} onChange={(event) => updateField('notes', event.target.value)} placeholder="Placement, spelling, deadline, gift notes, usage, or anything specific." />
+        </label>
+      </ConfigureGroup>
+    </>
+  );
+}
+
+function QrStandConfigureFields({ form, updateField }) {
+  function applyTemplate(template) {
+    const templateDefaults = qrStandTemplates[template];
+    updateField('template', template);
+    updateField('topText', templateDefaults.topText);
+    updateField('bottomText', templateDefaults.bottomText);
+    updateField('qrContent', templateDefaults.qrContent);
+    updateField('bottomLogoNotes', templateDefaults.bottomLogoNotes);
+  }
+
+  return (
+    <>
+      <ConfigureGroup title="Template">
+        <div className="segmented-row template-row" aria-label="QR stand template">
+          {Object.keys(qrStandTemplates).map((template) => (
+            <button
+              className={form.template === template ? 'is-active' : ''}
+              key={template}
+              type="button"
+              onClick={() => applyTemplate(template)}
+            >
+              {template}
+            </button>
+          ))}
+        </div>
+      </ConfigureGroup>
+
+      <ConfigureGroup title="Front content">
+        <label className="field-control">
+          <span>Top text</span>
+          <input value={form.topText} onChange={(event) => updateField('topText', event.target.value)} placeholder="Example: Follow Us!, Pay With Zelle, Scan Here" />
+        </label>
+        <label className="field-control">
+          <span>Bottom text</span>
+          <input value={form.bottomText} onChange={(event) => updateField('bottomText', event.target.value)} placeholder="Used when no bottom logo is requested" />
+        </label>
+        <label className="field-control">
+          <span>Bottom logo notes</span>
+          <input value={form.bottomLogoNotes} onChange={(event) => updateField('bottomLogoNotes', event.target.value)} placeholder="Optional. Replaces bottom text when used." />
+        </label>
+        <p className="field-note">If a bottom logo is used, it replaces the bottom text area.</p>
+        <label className="field-control">
+          <span>QR code link or content</span>
+          <input value={form.qrContent} onChange={(event) => updateField('qrContent', event.target.value)} placeholder="Payment link, social profile, menu, contact card, or website" />
+        </label>
+      </ConfigureGroup>
+
+      <ConfigureGroup title="Color zones">
+        <ColorZonePicker label="Text box color" value={form.textBoxColor} onChange={(value) => updateField('textBoxColor', value)} />
+        <ColorZonePicker label="QR code color" value={form.qrColor} onChange={(value) => updateField('qrColor', value)} />
+        <ColorZonePicker label="Rear ornament color" value={form.rearOrnamentColor} onChange={(value) => updateField('rearOrnamentColor', value)} />
+      </ConfigureGroup>
+
+      <ConfigureGroup title="Rear ornament and notes">
+        <div className="segmented-row" aria-label="Rear ornament">
+          {['None', 'Custom ornament requested'].map((ornament) => (
+            <button
+              className={form.rearOrnament === ornament ? 'is-active' : ''}
+              key={ornament}
+              type="button"
+              onClick={() => updateField('rearOrnament', ornament)}
+            >
+              {ornament}
+            </button>
+          ))}
+        </div>
+        <label className="field-control">
+          <span>Ornament name or idea</span>
+          <input value={form.size} onChange={(event) => updateField('size', event.target.value)} placeholder="Example: wizard hat, camera, flower, logo shape, simple initials" />
+        </label>
+        <label className="field-control">
+          <span>Additional notes</span>
+          <textarea value={form.notes} onChange={(event) => updateField('notes', event.target.value)} placeholder="Business use, placement, deadline, logo file details, ornament idea, or anything specific." />
+        </label>
+      </ConfigureGroup>
+    </>
+  );
+}
+
+function ColorZonePicker({ label, value, onChange }) {
+  return (
+    <div className="color-zone-picker">
+      <strong>{label}</strong>
+      <ColorSwatches colors={plaColors} selectedColor={value} onSelectColor={onChange} />
+    </div>
   );
 }
 
@@ -1085,6 +1245,12 @@ function getDefaultConfigureForm(product) {
       qrContent: 'Profile, menu, portfolio, or contact link',
       size: 'Standard desktop stand',
     },
+    'qr-code-business-stand': {
+      mainText: '',
+      secondaryText: '',
+      qrContent: 'Payment link, social profile, menu, contact card, or website',
+      size: 'Standard counter stand',
+    },
   };
 
   return {
@@ -1092,6 +1258,14 @@ function getDefaultConfigureForm(product) {
     secondaryText: defaults[product.slug]?.secondaryText ?? '',
     qrContent: defaults[product.slug]?.qrContent ?? '',
     logoNotes: '',
+    template: 'Custom',
+    topText: '',
+    bottomText: '',
+    bottomLogoNotes: '',
+    textBoxColor: 'PLA white',
+    qrColor: 'PLA black',
+    rearOrnament: 'None',
+    rearOrnamentColor: 'PLA orange',
     layout: 'Standard',
     size: defaults[product.slug]?.size ?? '',
     notes: '',
@@ -1101,6 +1275,35 @@ function getDefaultConfigureForm(product) {
 }
 
 function getConfigurationSummary(product, selectedColor, selectedMaterial, form) {
+  if (product.configureType === 'qr-stand') {
+    return [
+      'NOTE: This configuration is an outline, not the final print plan.',
+      'Gadjit Prints will review it, communicate about specifics, and send previews or confirmation details before production.',
+      '',
+      `Product: ${product.title}`,
+      `Category: ${product.category}`,
+      `Estimated price: ${getPriceDisplay(product, selectedColor)}`,
+      `Template: ${form.template || 'Custom'}`,
+      `Base plate color: ${selectedColor.name}`,
+      `Material: ${selectedMaterial}`,
+      `Premium base finish: ${selectedColor.priceNote ?? 'None'}`,
+      `Text box color: ${form.textBoxColor || 'Not provided'}`,
+      `QR code color: ${form.qrColor || 'Not provided'}`,
+      `Rear ornament: ${form.rearOrnament || 'None'}`,
+      `Rear ornament color: ${form.rearOrnamentColor || 'Not provided'}`,
+      `Top text: ${form.topText || 'Not provided'}`,
+      `Bottom text: ${form.bottomText || 'Not provided'}`,
+      `Bottom logo notes: ${form.bottomLogoNotes || 'None'}`,
+      'Bottom content rule: Bottom logo replaces bottom text when provided.',
+      `QR code content: ${form.qrContent || 'Not provided'}`,
+      `Ornament name or idea: ${form.size || 'Not provided'}`,
+      `Additional notes: ${form.notes || 'None'}`,
+      `Customer name: ${form.customerName || 'Not provided'}`,
+      `Customer contact: ${form.customerContact || 'Not provided'}`,
+      'Reference model: In-house Gadjit Prints design',
+    ].join('\n');
+  }
+
   return [
     'NOTE: This configuration is an outline, not the final print plan.',
     'Gadjit Prints will review it, communicate about specifics, and send previews or confirmation details before production.',
@@ -1120,7 +1323,7 @@ function getConfigurationSummary(product, selectedColor, selectedMaterial, form)
     `Studio notes: ${form.notes || 'None'}`,
     `Customer name: ${form.customerName || 'Not provided'}`,
     `Customer contact: ${form.customerContact || 'Not provided'}`,
-    `Reference model: ${product.sourceUrl}`,
+    `Reference model: ${product.sourceUrl ?? 'In-house Gadjit Prints design'}`,
   ].join('\n');
 }
 

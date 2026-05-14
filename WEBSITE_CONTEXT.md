@@ -80,6 +80,14 @@ The website currently has several configurable products sourced from MakerWorld 
    - Category: Business & Branding
    - Has real listing images.
 
+6. QR Code Business Stand
+   - Slug: `qr-code-business-stand`
+   - Type: in-house QR display stand
+   - Category: Business & Branding
+   - Uses local optimized images in `public/products`.
+   - This is an in-house Gadjit Prints design and should show a subtle `In-house design` badge/callout.
+   - Configurable fields include template, top text, bottom text, optional bottom logo, QR content, rear ornament, base color, text box color, QR color, and rear ornament color.
+
 Each product supports a fixed set of color options. Each color has a subset of available materials, not every material in every color. Products may also support configurable content such as names, initials, QR destinations, labels, phrases, icons, sizing, mounting, or layouts. This is important: the UI should communicate real option constraints instead of implying infinite customization.
 
 The catalog is not meant to feel like shelf inventory. Products are made after the customer outlines the configuration, and the studio should clearly communicate that previews, clarification, and longer wait times are part of the more careful ordering process.
@@ -207,6 +215,7 @@ Important components in `src/main.jsx`:
   - Listing-style configurable product card.
   - Maintains selected color and material state locally.
   - Uses `ProductMedia` to show real product photos when available.
+  - Shows a subtle product badge when `product.badge` exists.
 
 - `ProductDetail`
   - Looks up product by URL slug.
@@ -219,6 +228,10 @@ Important components in `src/main.jsx`:
 
 - `ProductMedia`
   - Chooses between real product images and the CSS-rendered `ProductVisual` fallback.
+
+- `QrStandConfigureFields`
+  - Product-specific configuration UI for the in-house QR Code Business Stand.
+  - Supports Custom, Facebook Stand, Zelle Stand, and Instagram Stand templates plus multiple color zones.
 
 - `ColorSwatches`
   - Color selector UI.
@@ -268,6 +281,9 @@ Fields with special behavior:
 - `imageUrls`: real product listing photos. If empty, the UI falls back to `ProductVisual`.
 - `colors`: controls swatches and available material options.
 - `config`: shown as product capability tags.
+- `badge`: optional product badge, currently used for the in-house QR stand.
+- `configureType`: optional product-specific configure form switch, currently `qr-stand`.
+- `inHouseNote`: optional detail-page callout copy for in-house products.
 
 ## Styling Architecture
 
