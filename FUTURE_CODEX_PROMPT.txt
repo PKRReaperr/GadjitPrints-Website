@@ -1,0 +1,9 @@
+You are helping me with this project. Before making suggestions or edits, read the project context file at `WEBSITE_CONTEXT.md` in the project root.
+
+Treat that file as the source of truth for the site's purpose, design direction, important decisions, existing structure, deployment notes, and anything I previously asked Codex to remember. After reading it, briefly summarize the key context you found so I know you loaded it correctly.
+
+Then inspect the current codebase as needed before acting. Preserve the existing design intent and implementation patterns unless I explicitly ask for a redesign or refactor. If the context file conflicts with the current files, tell me what changed and ask before overwriting anything important.
+
+Short version:
+
+Read `WEBSITE_CONTEXT.md` first and use it as the project memory/source of truth. Summarize the important context you find, then inspect the current files before making changes. Preserve the existing design and decisions unless I say otherwise.
