@@ -1456,6 +1456,39 @@ p {
     rgba(24, 21, 17, 0.96);
   color: var(--bone);
   box-shadow: 0 20px 42px rgba(0, 0, 0, 0.32);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.catalog-card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 8px;
+}
+
+.catalog-card-link:focus-visible {
+  outline: 2px solid rgba(224, 177, 111, 0.9);
+  outline-offset: 3px;
+}
+
+.catalog-card:hover {
+  border-color: rgba(200, 150, 82, 0.36);
+  transform: translateY(-2px);
+}
+
+.catalog-card-title,
+.catalog-media,
+.catalog-specs,
+.catalog-tags {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.catalog-options,
+.configure-button {
+  position: relative;
+  z-index: 2;
 }
 
 .catalog-card-title {

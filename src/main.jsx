@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Navigate, NavLink, Route, BrowserRouter as Router, Routes, useLocation, useParams } from 'react-router-dom';
 import {
@@ -53,30 +53,30 @@ const materialInfo = {
 };
 
 const colorLibrary = {
-  'PLA Silk hot pink': {
+  'Silk hot pink': {
     swatch: '#ff4faf',
     swatchStyle: 'linear-gradient(135deg, #ff9bd4, #ff4faf 48%, #b71374)',
     materials: ['PLA'],
   },
-  'PLA Silk purple': {
+  'Silk purple': {
     swatch: '#8d50d8',
     swatchStyle: 'linear-gradient(135deg, #c6a0ff, #8d50d8 52%, #4b238f)',
     materials: ['PLA'],
   },
-  'PLA orange': { swatch: '#f47a24', materials: ['PLA'] },
-  'PLA Glow blue': {
+  Orange: { swatch: '#f47a24', materials: ['PLA'] },
+  'Glow blue': {
     swatch: '#7ad8ff',
     swatchStyle: 'radial-gradient(circle at 35% 30%, #e8fbff, #7ad8ff 52%, #2f83bb)',
     materials: ['PLA'],
     priceAdd: 5,
     priceNote: 'Glow PLA +$5',
   },
-  'PLA green': { swatch: '#32a852', materials: ['PLA'] },
-  'PLA blue': { swatch: '#2466e8', materials: ['PLA'] },
-  'PLA red': { swatch: '#d6292f', materials: ['PLA'] },
-  'PLA white': { swatch: '#f5f1e8', materials: ['PLA'] },
-  'PLA black': { swatch: '#11100e', materials: ['PLA'] },
-  'PLA galaxy black': {
+  Green: { swatch: '#32a852', materials: ['PLA', 'PETG'] },
+  Blue: { swatch: '#2466e8', materials: ['PLA', 'PETG'] },
+  Red: { swatch: '#d6292f', materials: ['PLA', 'PETG'] },
+  White: { swatch: '#f5f1e8', materials: ['PLA', 'PETG', 'ABS'] },
+  Black: { swatch: '#11100e', materials: ['PLA', 'PETG', 'ABS'] },
+  'Galaxy black': {
     swatch: '#17171c',
     swatchStyle: 'radial-gradient(circle at 30% 28%, #d6d0ff 0 2px, transparent 3px), radial-gradient(circle at 66% 62%, #9bdcff 0 1px, transparent 3px), linear-gradient(135deg, #2d2d38, #111117)',
     materials: ['PLA'],
@@ -85,8 +85,8 @@ const colorLibrary = {
   },
 };
 
-const plaColorNames = Object.keys(colorLibrary);
-const plaColors = plaColorNames.map((name) => ({ name, ...colorLibrary[name] }));
+const colorNames = Object.keys(colorLibrary);
+const productColors = colorNames.map((name) => ({ name, ...colorLibrary[name] }));
 
 const qrStandTemplates = {
   Custom: {
@@ -128,7 +128,7 @@ const products = [
       'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUSa79b282bc488cd%2Fdesign%2Fbe65cd04b4540925.jpg&w=828',
     ],
     copy: 'A rigid printed business card with raised text, a scannable QR area, and a clean pocketable profile.',
-    colors: plaColors,
+    colors: productColors,
     config: ['Name and title', 'QR destination', 'Logo or small icon'],
     price: 'From $18',
     leadTime: '2-4 studio days',
@@ -149,7 +149,7 @@ const products = [
       '/products/qr-code-business-stand-print-bed.webp',
     ],
     copy: 'A custom counter stand for QR payments, social follows, menus, contact links, booths, and small business displays.',
-    colors: plaColors,
+    colors: productColors,
     config: ['Top text', 'QR color', 'Bottom text or logo', 'Rear ornament'],
     price: 'From $35',
     leadTime: '7-10 studio days',
@@ -168,7 +168,7 @@ const products = [
     customizeUrl: 'https://makerworld.com/en/makerlab/parametricModelMaker?designId=2740326&from=model_page&modelName=nombre-v3.scad&protected=true&unikey=a926126f-79e1-4363-aeeb-382ea6aede75',
     imageUrls: ['/products/initial-ornament-name.png'],
     copy: 'A personalized ornament built around a large initial, custom name text, and a finished hanging loop.',
-    colors: plaColors,
+    colors: productColors,
     config: ['Initial letter', 'Name text', 'Loop style'],
     price: 'From $16',
     leadTime: '2-4 studio days',
@@ -185,7 +185,7 @@ const products = [
     sourceUrl: 'https://makerworld.com/en/models/2737514-customizable-door-hanger-text-svg-emoji-support#profileId-3035138',
     imageUrls: ['/products/custom-door-hanger.png'],
     copy: 'A customizable door hanger with text, SVG, or emoji-style artwork support for rooms, studios, and events.',
-    colors: plaColors,
+    colors: productColors,
     config: ['Front text', 'Icon or SVG', 'Single or two-tone'],
     price: 'From $22',
     leadTime: '3-5 studio days',
@@ -205,7 +205,7 @@ const products = [
       'https://makerworld.bblmw.com/makerworld/model/USc7eb59bdce5c4b/design/2024-10-17_6e2de6ddb58ca.jpg?x-oss-process=image%2Fresize%2Cw_1000%2Fformat%2Cwebp',
     ],
     copy: 'A custom travel tag with a QR code, name field, and sturdy strap slot for luggage, backpacks, and gear bags.',
-    colors: plaColors,
+    colors: productColors,
     config: ['QR destination', 'Name or handle', 'Tag size'],
     price: 'From $20',
     leadTime: '2-4 studio days',
@@ -226,7 +226,7 @@ const products = [
       'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2Ff50dbabe572c2658.jpg&w=828',
     ],
     copy: 'A configurable name plate with QR code support that can sit on a desk or mount to a wall.',
-    colors: plaColors,
+    colors: productColors,
     config: ['Display text', 'QR destination', 'Stand or wall mount'],
     price: 'From $26',
     leadTime: '3-5 studio days',
@@ -242,7 +242,7 @@ const processSteps = [
   {
     step: '01',
     title: 'Choose a Product',
-    text: 'Start with a product from the catalog, then choose the available color, finish direction, and content options.',
+    text: 'Start with a product from the catalog, then choose the material, available color, finish direction, and content options.',
   },
   {
     step: '02',
@@ -263,10 +263,11 @@ const processSteps = [
 
 const materials = [
   'PLA: standard color prints',
+  'PETG: limited functional colors',
+  'ABS: black and white utility prints',
   'Silk PLA: glossy hot pink and purple',
   'Glow PLA: premium blue finish',
   'Galaxy PLA: premium black finish',
-  'Available color ranges',
   'Made after selection',
 ];
 
@@ -466,7 +467,7 @@ function ProcessPreview() {
         <p className="eyebrow">Configuration rhythm</p>
         <h2>A slower, more careful path to the right print.</h2>
         <p>
-          You begin with a product, choose the available color and material, then add the details that make it yours.
+          You begin with a product, choose the material and its available colors, then add the details that make it yours.
           Gadjit Prints reviews the outline and follows up before production begins.
         </p>
         <NavLink className="text-link" to="/process">
@@ -493,8 +494,8 @@ function Materials() {
     <section className="section material-section">
       <SectionIntro
         label="Surface and material"
-        title="Matte, mineral, satin, translucent, structural."
-        copy="Each product shows the colors and materials currently available, so customers choose from real shop options instead of an endless, impossible color wheel."
+        title="Matte PLA, tougher PETG, heat-aware ABS, and specialty PLA finishes."
+        copy="Each product starts with a material choice, then shows only the colors available for that material, so customers choose from real shop options instead of an endless, impossible color wheel."
       />
       <div className="material-grid">
         {materials.map((material) => {
@@ -555,7 +556,7 @@ function Collection() {
     <PageFrame
       label="Products"
       title="Made-to-order 3D prints, ready to personalize."
-      copy="Browse available products, choose the color and material on each card, then use Configure to outline names, QR codes, labels, sizing, or layout details before the studio reviews the order."
+      copy="Browse available products, choose the material and matching color on each card, then use Configure to outline names, QR codes, labels, sizing, or layout details before the studio reviews the order."
     >
       <div className="catalog-shell">
         <aside className="catalog-filters">
@@ -606,7 +607,7 @@ function Process() {
     <PageFrame
       label="Configuration process"
       title="A careful path from product choice to approved print."
-      copy="Pick a product, choose from the available color and material options, add the configurable content, and expect a review before printing begins."
+      copy="Pick a product, choose a material first, choose from its available colors, add the configurable content, and expect a review before printing begins."
     >
       <div className="timeline">
         {processSteps.map((step) => (
@@ -701,18 +702,24 @@ function Note({ icon, title, text }) {
 }
 
 function ProductCard({ product }) {
-  const [selectedColorName, setSelectedColorName] = useState(product.colors[0].name);
-  const selectedColor = product.colors.find((color) => color.name === selectedColorName) ?? product.colors[0];
-  const [selectedMaterial, setSelectedMaterial] = useState(selectedColor.materials[0]);
+  const [selectedMaterial, setSelectedMaterial] = useState(getDefaultMaterial(product));
+  const materialColors = useMemo(() => getColorsForMaterial(product, selectedMaterial), [product, selectedMaterial]);
+  const [selectedColorName, setSelectedColorName] = useState(materialColors[0].name);
+  const selectedColor = materialColors.find((color) => color.name === selectedColorName) ?? materialColors[0];
 
   useEffect(() => {
-    if (!selectedColor.materials.includes(selectedMaterial)) {
-      setSelectedMaterial(selectedColor.materials[0]);
+    if (!materialColors.some((color) => color.name === selectedColorName)) {
+      setSelectedColorName(materialColors[0].name);
     }
-  }, [selectedColor, selectedMaterial]);
+  }, [materialColors, selectedColorName]);
 
   return (
     <article className="catalog-card reveal">
+      <NavLink
+        className="catalog-card-link"
+        to={`/collection/${product.slug}`}
+        aria-label={`View ${product.title}`}
+      />
       <div className="catalog-card-title">
         {product.badge ? <span className="product-badge">{product.badge}</span> : null}
         <h3>{product.title}</h3>
@@ -731,18 +738,18 @@ function ProductCard({ product }) {
         </div>
       </div>
       <div className="catalog-options">
-        <OptionGroup title="Color">
-          <ColorSwatches
-            colors={product.colors}
-            selectedColor={selectedColorName}
-            onSelectColor={setSelectedColorName}
-          />
-        </OptionGroup>
         <OptionGroup title="Material">
           <MaterialChoices
-            available={selectedColor.materials}
+            product={product}
             selectedMaterial={selectedMaterial}
             onSelectMaterial={setSelectedMaterial}
+          />
+        </OptionGroup>
+        <OptionGroup title={`${selectedMaterial} colors`}>
+          <ColorSwatches
+            colors={materialColors}
+            selectedColor={selectedColorName}
+            onSelectColor={setSelectedColorName}
           />
         </OptionGroup>
       </div>
@@ -770,17 +777,18 @@ function ProductDetail() {
 }
 
 function ProductDetailContent({ product }) {
-  const [selectedColorName, setSelectedColorName] = useState(product.colors[0].name);
-  const selectedColor = product.colors.find((color) => color.name === selectedColorName) ?? product.colors[0];
-  const [selectedMaterial, setSelectedMaterial] = useState(selectedColor.materials[0]);
+  const [selectedMaterial, setSelectedMaterial] = useState(getDefaultMaterial(product));
+  const materialColors = useMemo(() => getColorsForMaterial(product, selectedMaterial), [product, selectedMaterial]);
+  const [selectedColorName, setSelectedColorName] = useState(materialColors[0].name);
+  const selectedColor = materialColors.find((color) => color.name === selectedColorName) ?? materialColors[0];
   const hasProductPhotos = product.imageUrls?.length > 0;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
-    if (!selectedColor.materials.includes(selectedMaterial)) {
-      setSelectedMaterial(selectedColor.materials[0]);
+    if (!materialColors.some((color) => color.name === selectedColorName)) {
+      setSelectedColorName(materialColors[0].name);
     }
-  }, [selectedColor, selectedMaterial]);
+  }, [materialColors, selectedColorName]);
 
   useEffect(() => {
     setSelectedImageIndex(0);
@@ -809,7 +817,7 @@ function ProductDetailContent({ product }) {
                   <img src={imageUrl} alt="" loading="lazy" decoding="async" />
                 </button>
               ))
-            : [product.colors[0], product.colors[1], product.colors[2], selectedColor].filter(Boolean).map((color, index) => (
+            : [materialColors[0], materialColors[1], materialColors[2], selectedColor].filter(Boolean).map((color, index) => (
                 <button
                   className={color.name === selectedColor.name ? 'is-active' : ''}
                   key={`${color.name}-${index}`}
@@ -880,15 +888,15 @@ function ProductDetailContent({ product }) {
             <span>{getPriceDisplay(product, selectedColor)}</span>
             <small>{selectedColor.priceNote ?? 'Made after selection'}</small>
           </div>
-          <OptionGroup title="Color">
-            <ColorSwatches colors={product.colors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
-          </OptionGroup>
           <OptionGroup title="Material">
             <MaterialChoices
-              available={selectedColor.materials}
+              product={product}
               selectedMaterial={selectedMaterial}
               onSelectMaterial={setSelectedMaterial}
             />
+          </OptionGroup>
+          <OptionGroup title={`${selectedMaterial} colors`}>
+            <ColorSwatches colors={materialColors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
           </OptionGroup>
           <div className="buybox-selected">
             <strong>Current configuration</strong>
@@ -933,16 +941,26 @@ function ProductConfigure() {
 }
 
 function ProductConfigureContent({ product }) {
-  const [selectedColorName, setSelectedColorName] = useState(product.colors[0].name);
-  const selectedColor = product.colors.find((color) => color.name === selectedColorName) ?? product.colors[0];
-  const selectedMaterial = selectedColor.materials[0];
+  const [selectedMaterial, setSelectedMaterial] = useState(getDefaultMaterial(product));
+  const materialColors = useMemo(() => getColorsForMaterial(product, selectedMaterial), [product, selectedMaterial]);
+  const [selectedColorName, setSelectedColorName] = useState(materialColors[0].name);
+  const selectedColor = materialColors.find((color) => color.name === selectedColorName) ?? materialColors[0];
   const [form, setForm] = useState(() => getDefaultConfigureForm(product));
   const [copied, setCopied] = useState(false);
   const summary = getConfigurationSummary(product, selectedColor, selectedMaterial, form);
   const emailHref = getConfigurationEmailHref(product, summary);
 
   useEffect(() => {
-    setSelectedColorName(product.colors[0].name);
+    if (!materialColors.some((color) => color.name === selectedColorName)) {
+      setSelectedColorName(materialColors[0].name);
+    }
+  }, [materialColors, selectedColorName]);
+
+  useEffect(() => {
+    const defaultMaterial = getDefaultMaterial(product);
+    const defaultColors = getColorsForMaterial(product, defaultMaterial);
+    setSelectedMaterial(defaultMaterial);
+    setSelectedColorName(defaultColors[0].name);
     setForm(getDefaultConfigureForm(product));
     setCopied(false);
   }, [product]);
@@ -982,8 +1000,13 @@ function ProductConfigureContent({ product }) {
         </aside>
 
         <section className="configure-form-panel">
-          <ConfigureGroup title={product.configureType === 'qr-stand' ? 'Base plate color' : 'Finish'}>
-            <ColorSwatches colors={product.colors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
+          <ConfigureGroup title={product.configureType === 'qr-stand' ? 'Base plate finish' : 'Finish'}>
+            <MaterialChoices
+              product={product}
+              selectedMaterial={selectedMaterial}
+              onSelectMaterial={setSelectedMaterial}
+            />
+            <ColorSwatches colors={materialColors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
             <div className="buybox-selected">
               <strong>{product.configureType === 'qr-stand' ? 'Selected base plate' : 'Selected finish'}</strong>
               <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
@@ -1173,7 +1196,7 @@ function ColorZonePicker({ label, value, onChange }) {
   return (
     <div className="color-zone-picker">
       <strong>{label}</strong>
-      <ColorSwatches colors={plaColors} selectedColor={value} onSelectColor={onChange} />
+      <ColorSwatches colors={productColors} selectedColor={value} onSelectColor={onChange} />
     </div>
   );
 }
@@ -1262,10 +1285,10 @@ function getDefaultConfigureForm(product) {
     topText: '',
     bottomText: '',
     bottomLogoNotes: '',
-    textBoxColor: 'PLA white',
-    qrColor: 'PLA black',
+    textBoxColor: 'White',
+    qrColor: 'Black',
     rearOrnament: 'None',
-    rearOrnamentColor: 'PLA orange',
+    rearOrnamentColor: 'Orange',
     layout: 'Standard',
     size: defaults[product.slug]?.size ?? '',
     notes: '',
@@ -1388,6 +1411,19 @@ function getMaterialCounts(items) {
   );
 }
 
+function getProductMaterials(product) {
+  const availableMaterials = new Set(product.colors.flatMap((color) => color.materials));
+  return Object.keys(materialInfo).filter((material) => availableMaterials.has(material));
+}
+
+function getDefaultMaterial(product) {
+  return getProductMaterials(product)[0];
+}
+
+function getColorsForMaterial(product, material) {
+  return product.colors.filter((color) => color.materials.includes(material));
+}
+
 function OptionGroup({ title, children }) {
   return (
     <div className="option-group">
@@ -1419,18 +1455,24 @@ function ColorSwatches({ colors, selectedColor, onSelectColor }) {
   );
 }
 
-function MaterialChoices({ available, selectedMaterial, onSelectMaterial }) {
+function MaterialChoices({ product, selectedMaterial, onSelectMaterial }) {
+  const available = getProductMaterials(product);
+
   return (
     <div className="material-choice-row">
-      {Object.keys(materialInfo).filter((material) => available.includes(material)).map((material) => (
-        <MaterialBadge
-          key={material}
-          material={material}
-          selected={selectedMaterial === material}
-          disabled={!available.includes(material)}
-          onClick={() => available.includes(material) && onSelectMaterial(material)}
-        />
-      ))}
+      {Object.keys(materialInfo).map((material) => {
+        const isAvailable = available.includes(material);
+
+        return (
+          <MaterialBadge
+            key={material}
+            material={material}
+            selected={selectedMaterial === material}
+            disabled={!isAvailable}
+            onClick={isAvailable ? () => onSelectMaterial(material) : undefined}
+          />
+        );
+      })}
     </div>
   );
 }

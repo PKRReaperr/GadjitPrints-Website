@@ -88,7 +88,7 @@ The website currently has several configurable products sourced from MakerWorld 
    - This is an in-house Gadjit Prints design and should show a subtle `In-house design` badge/callout.
    - Configurable fields include template, top text, bottom text, optional bottom logo, QR content, rear ornament, base color, text box color, QR color, and rear ornament color.
 
-Each product supports a fixed set of color options. Each color has a subset of available materials, not every material in every color. Products may also support configurable content such as names, initials, QR destinations, labels, phrases, icons, sizing, mounting, or layouts. This is important: the UI should communicate real option constraints instead of implying infinite customization.
+Each product supports a fixed set of material and color options. The UI asks customers to choose a material first, then shows the colors available for that material. Not every material exists in every color. Products may also support configurable content such as names, initials, QR destinations, labels, phrases, icons, sizing, mounting, or layouts. This is important: the UI should communicate real option constraints instead of implying infinite customization.
 
 The catalog is not meant to feel like shelf inventory. Products are made after the customer outlines the configuration, and the studio should clearly communicate that previews, clarification, and longer wait times are part of the more careful ordering process.
 
@@ -113,7 +113,7 @@ Supported materials:
   - Better heat resistance than PLA or PETG, more suitable for outdoor use.
   - Fewer finish options and may require more post-print cleanup.
 
-The UI exposes this through material badges with hover/focus tooltips. Disabled material choices remain visible but unavailable when a selected color does not support that material.
+The UI exposes this through material badges with hover/focus tooltips. Material is selected before color; disabled material choices remain visible only when a product does not support that material. Current availability is intentionally constrained: specialty finishes such as silk, glow, and galaxy are PLA-only; PETG is available on a smaller set of plain colors; ABS is available only on the most basic utility colors.
 
 ## Color Model
 
@@ -121,6 +121,8 @@ The color model lives in `src/main.jsx` as `colorLibrary`. Product colors refere
 
 - `swatch`: the visual color value.
 - `materials`: the available material options for that color.
+
+Use `getColorsForMaterial(product, material)` to derive the material-specific color category shown in product cards, product detail buyboxes, and configure forms.
 
 The product model maps color names into full color objects, for example:
 
@@ -144,7 +146,7 @@ Routes:
   - Main products page.
   - Amazon/listing-inspired product cards, but restyled into the dark premium Gadjit Prints design language.
   - Includes filters and configurable product cards.
-  - Each card has color and material selectors and a `Configure` button.
+  - Each card has material and material-specific color selectors plus a `Configure` button.
 
 - `/collection/:slug`
   - Product detail/listing page.
@@ -213,7 +215,8 @@ Important components in `src/main.jsx`:
 
 - `ProductCard`
   - Listing-style configurable product card.
-  - Maintains selected color and material state locally.
+  - Maintains selected material and color state locally.
+  - Shows material first, then the color category for that material.
   - Uses `ProductMedia` to show real product photos when available.
   - Shows a subtle product badge when `product.badge` exists.
 
@@ -222,7 +225,8 @@ Important components in `src/main.jsx`:
 
 - `ProductDetailContent`
   - Full product detail layout.
-  - Maintains selected color, material, and selected image index.
+  - Maintains selected material, color, and selected image index.
+  - Shows material first in the buybox, then the color category for that material.
   - Shows real image thumbnails when `product.imageUrls` exists.
   - Falls back to color-based `ProductVisual` thumbnails when no images are available.
 
