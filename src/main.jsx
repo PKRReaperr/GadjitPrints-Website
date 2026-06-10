@@ -133,6 +133,12 @@ const products = [
     price: 'From $18',
     leadTime: '2-4 studio days',
     dimensions: 'Standard card footprint',
+    printDimensions: {
+      width: 80,
+      height: 55,
+      depth: 3,
+      note: 'Fixed reference card size from the source model; raised QR and text details are included in the thickness estimate.',
+    },
     finish: 'Flat two-tone detail',
     includes: ['QR code area', 'Custom name text', 'Optional logo mark'],
   },
@@ -154,6 +160,12 @@ const products = [
     price: 'From $35',
     leadTime: '7-10 studio days',
     dimensions: 'Countertop display scale',
+    printDimensions: {
+      width: 140,
+      height: 110,
+      depth: 75,
+      note: 'Approximate in-house countertop footprint. Final stand depth and ornament size are confirmed during studio review.',
+    },
     finish: 'Multi-color raised QR display',
     includes: ['In-house stand design', 'Custom text zones', 'QR code panel', 'Optional rear ornament'],
     inHouseNote: 'Designed entirely in house by Gadjit Prints. The base plate, QR panel, text boxes, bottom logo area, and optional rear ornament can be tuned for each order.',
@@ -173,6 +185,12 @@ const products = [
     price: 'From $16',
     leadTime: '2-4 studio days',
     dimensions: '3-5 in ornament span',
+    printDimensions: {
+      width: 100,
+      height: 100,
+      depth: 4,
+      note: 'Approximate standard ornament span. Long names, wide letters, or custom loop choices can change the final footprint.',
+    },
     finish: 'Layered raised lettering',
     includes: ['Large initial', 'Custom name', 'Hanging loop'],
   },
@@ -190,6 +208,12 @@ const products = [
     price: 'From $22',
     leadTime: '3-5 studio days',
     dimensions: 'Standard door-hanger scale',
+    printDimensions: {
+      width: 89,
+      height: 216,
+      depth: 4,
+      note: 'Standard door-hanger footprint with a knob cutout. Custom graphics may change the usable text area.',
+    },
     finish: 'Durable readable face',
     includes: ['Custom phrase', 'Graphic option', 'Door knob cutout'],
   },
@@ -210,6 +234,12 @@ const products = [
     price: 'From $20',
     leadTime: '2-4 studio days',
     dimensions: 'Medium or large tag',
+    printDimensions: {
+      width: 108,
+      height: 64,
+      depth: 3,
+      note: 'Medium luggage-tag footprint. The parametric source supports tag-size changes and recommends at least 2 mm thickness.',
+    },
     finish: 'Raised QR and text panel',
     includes: ['QR code panel', 'Name field', 'Strap slot'],
   },
@@ -231,6 +261,12 @@ const products = [
     price: 'From $26',
     leadTime: '3-5 studio days',
     dimensions: '5-10 in width',
+    printDimensions: {
+      width: 200,
+      height: 70,
+      depth: 65,
+      note: 'Approximate desktop stand footprint. The parametric source can change width, height, thickness, stand depth, and wall-mount details.',
+    },
     finish: 'Raised two-tone signage',
     includes: ['QR code panel', 'Custom display name', 'Stand or wall option'],
   },
@@ -269,6 +305,13 @@ const materials = [
   'Glow PLA: premium blue finish',
   'Galaxy PLA: premium black finish',
   'Made after selection',
+];
+
+const sizeOptions = [
+  { label: 'Mini', scale: '50%' },
+  { label: 'Compact', scale: '75%' },
+  { label: 'Standard', scale: '100%' },
+  { label: 'Large', scale: '150%' },
 ];
 
 function App() {
@@ -995,7 +1038,7 @@ function ProductConfigureContent({ product }) {
           <div className="configure-preview-specs">
             <span>{getPriceDisplay(product, selectedColor)}</span>
             <span>{product.leadTime}</span>
-            <span>{product.dimensions}</span>
+            <span>{formatDimensions(product.printDimensions)}</span>
           </div>
         </aside>
 
@@ -1014,9 +1057,13 @@ function ProductConfigureContent({ product }) {
           </ConfigureGroup>
 
           {product.configureType === 'qr-stand' ? (
+            <PrintDimensions product={product} layout={form.layout} />
+          ) : null}
+
+          {product.configureType === 'qr-stand' ? (
             <QrStandConfigureFields form={form} updateField={updateField} />
           ) : (
-            <GenericConfigureFields form={form} updateField={updateField} />
+            <GenericConfigureFields product={product} form={form} updateField={updateField} />
           )}
 
           <ConfigureGroup title="Contact">
@@ -1065,7 +1112,7 @@ function ProductConfigureContent({ product }) {
   );
 }
 
-function GenericConfigureFields({ form, updateField }) {
+function GenericConfigureFields({ product, form, updateField }) {
   return (
     <>
       <ConfigureGroup title="Personal details">
@@ -1088,18 +1135,20 @@ function GenericConfigureFields({ form, updateField }) {
       </ConfigureGroup>
 
       <ConfigureGroup title="Size and layout">
-        <div className="segmented-row" aria-label="Layout style">
-          {['Standard', 'Compact', 'Large'].map((layout) => (
+        <div className="segmented-row size-row" aria-label="Layout size">
+          {sizeOptions.map((option) => (
             <button
-              className={form.layout === layout ? 'is-active' : ''}
-              key={layout}
+              className={form.layout === option.label ? 'is-active' : ''}
+              key={option.label}
               type="button"
-              onClick={() => updateField('layout', layout)}
+              onClick={() => updateField('layout', option.label)}
             >
-              {layout}
+              <span>{option.label}</span>
+              <small>{option.scale}</small>
             </button>
           ))}
         </div>
+        <PrintDimensions product={product} layout={form.layout} />
         <label className="field-control">
           <span>Requested size</span>
           <input value={form.size} onChange={(event) => updateField('size', event.target.value)} placeholder="Example: 4 in wide, standard, larger tag" />
@@ -1189,6 +1238,35 @@ function QrStandConfigureFields({ form, updateField }) {
         </label>
       </ConfigureGroup>
     </>
+  );
+}
+
+function PrintDimensions({ product, layout }) {
+  const selected = getScaledDimensions(product.printDimensions, layout);
+  const standard = getScaledDimensions(product.printDimensions, 'Standard');
+  const scaleLabel = getSizeOptionLabel(layout);
+  const showStandard = layout !== 'Standard';
+
+  return (
+    <div className="print-dimensions">
+      <div>
+        <strong>Expected print size</strong>
+        <span>{scaleLabel}</span>
+      </div>
+      <dl>
+        <div>
+          <dt>Selected</dt>
+          <dd>{formatDimensions(selected)}</dd>
+        </div>
+        {showStandard ? (
+          <div>
+            <dt>Standard</dt>
+            <dd>{formatDimensions(standard)}</dd>
+          </div>
+        ) : null}
+      </dl>
+      <p>{product.printDimensions.note}</p>
+    </div>
   );
 }
 
@@ -1309,6 +1387,7 @@ function getConfigurationSummary(product, selectedColor, selectedMaterial, form)
       `Template: ${form.template || 'Custom'}`,
       `Base plate color: ${selectedColor.name}`,
       `Material: ${selectedMaterial}`,
+      `Approx. print size: ${formatDimensions(product.printDimensions)}`,
       `Premium base finish: ${selectedColor.priceNote ?? 'None'}`,
       `Text box color: ${form.textBoxColor || 'Not provided'}`,
       `QR code color: ${form.qrColor || 'Not provided'}`,
@@ -1341,7 +1420,8 @@ function getConfigurationSummary(product, selectedColor, selectedMaterial, form)
     `Secondary text: ${form.secondaryText || 'Not provided'}`,
     `QR code content: ${form.qrContent || 'Not provided'}`,
     `Logo/file notes: ${form.logoNotes || 'None'}`,
-    `Layout: ${form.layout}`,
+    `Layout: ${getSizeOptionLabel(form.layout)}`,
+    `Approx. print size: ${formatDimensions(getScaledDimensions(product.printDimensions, form.layout))}`,
     `Requested size: ${form.size || 'Not provided'}`,
     `Studio notes: ${form.notes || 'None'}`,
     `Customer name: ${form.customerName || 'Not provided'}`,
@@ -1354,6 +1434,40 @@ function getConfigurationEmailHref(product, summary) {
   const subject = encodeURIComponent(`Gadjit Prints configuration: ${product.title}`);
   const body = encodeURIComponent(`${summary}\n\nPlease attach any logo, SVG, image, or reference files before sending.`);
   return `mailto:${studioEmail}?subject=${subject}&body=${body}`;
+}
+
+function getSizeOptionLabel(layout) {
+  const option = sizeOptions.find((item) => item.label === layout);
+  return option ? `${option.label} (${option.scale})` : layout;
+}
+
+function getSizeScale(layout) {
+  const option = sizeOptions.find((item) => item.label === layout);
+  return option ? Number.parseInt(option.scale, 10) / 100 : 1;
+}
+
+function getScaledDimensions(dimensions, layout) {
+  const scale = getSizeScale(layout);
+  return {
+    ...dimensions,
+    width: dimensions.width * scale,
+    height: dimensions.height * scale,
+    depth: dimensions.depth * scale,
+  };
+}
+
+function formatDimensions(dimensions) {
+  const metric = [dimensions.width, dimensions.height, dimensions.depth].map(formatMm).join(' x ');
+  const imperial = [dimensions.width, dimensions.height, dimensions.depth].map(formatInches).join(' x ');
+  return `${metric} mm (${imperial} in)`;
+}
+
+function formatMm(value) {
+  return Number.isInteger(value) ? value : Number.parseFloat(value.toFixed(1));
+}
+
+function formatInches(value) {
+  return (value / 25.4).toFixed(value < 25.4 ? 2 : 1);
 }
 
 function getConfigurationLabel(selectedColor, selectedMaterial) {
