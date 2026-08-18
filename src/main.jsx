@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Navigate, NavLink, Route, BrowserRouter as Router, Routes, useLocation, useParams } from 'react-router-dom';
 import {
@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import './styles.css';
+import { AdminApp } from './admin/AdminApp.jsx';
 
 const navItems = [
   { to: '/', label: 'Home' },
@@ -78,7 +79,8 @@ const colorLibrary = {
   Black: { swatch: '#11100e', materials: ['PLA', 'PETG', 'ABS'] },
   'Galaxy black': {
     swatch: '#17171c',
-    swatchStyle: 'radial-gradient(circle at 30% 28%, #d6d0ff 0 2px, transparent 3px), radial-gradient(circle at 66% 62%, #9bdcff 0 1px, transparent 3px), linear-gradient(135deg, #2d2d38, #111117)',
+    swatchStyle:
+      'radial-gradient(circle at 30% 28%, #d6d0ff 0 2px, transparent 3px), radial-gradient(circle at 66% 62%, #9bdcff 0 1px, transparent 3px), linear-gradient(135deg, #2d2d38, #111117)',
     materials: ['PLA'],
     priceAdd: 4,
     priceNote: 'Galaxy PLA +$4',
@@ -86,7 +88,10 @@ const colorLibrary = {
 };
 
 const colorNames = Object.keys(colorLibrary);
-const productColors = colorNames.map((name) => ({ name, ...colorLibrary[name] }));
+const productColors = colorNames.map((name) => ({
+  name,
+  ...colorLibrary[name],
+}));
 
 const qrStandTemplates = {
   Custom: {
@@ -150,10 +155,7 @@ const products = [
     variant: 'qr-plate',
     badge: 'In-house design',
     configureType: 'qr-stand',
-    imageUrls: [
-      '/products/qr-code-business-stand-hero.webp',
-      '/products/qr-code-business-stand-print-bed.webp',
-    ],
+    imageUrls: ['/products/qr-code-business-stand-hero.webp', '/products/qr-code-business-stand-print-bed.webp'],
     copy: 'A custom counter stand for QR payments, social follows, menus, contact links, booths, and small business displays.',
     colors: productColors,
     config: ['Top text', 'QR color', 'Bottom text or logo', 'Rear ornament'],
@@ -168,7 +170,8 @@ const products = [
     },
     finish: 'Multi-color raised QR display',
     includes: ['In-house stand design', 'Custom text zones', 'QR code panel', 'Optional rear ornament'],
-    inHouseNote: 'Designed entirely in house by Gadjit Prints. The base plate, QR panel, text boxes, bottom logo area, and optional rear ornament can be tuned for each order.',
+    inHouseNote:
+      'Designed entirely in house by Gadjit Prints. The base plate, QR panel, text boxes, bottom logo area, and optional rear ornament can be tuned for each order.',
   },
   {
     slug: 'initial-ornament-name',
@@ -176,8 +179,10 @@ const products = [
     type: 'Personal ornament',
     category: 'Ornaments & Gifts',
     variant: 'ornament',
-    sourceUrl: 'https://makerworld.com/en/models/2740326-fully-customizable-initial-ornament-and-name#profileId-3038641',
-    customizeUrl: 'https://makerworld.com/en/makerlab/parametricModelMaker?designId=2740326&from=model_page&modelName=nombre-v3.scad&protected=true&unikey=a926126f-79e1-4363-aeeb-382ea6aede75',
+    sourceUrl:
+      'https://makerworld.com/en/models/2740326-fully-customizable-initial-ornament-and-name#profileId-3038641',
+    customizeUrl:
+      'https://makerworld.com/en/makerlab/parametricModelMaker?designId=2740326&from=model_page&modelName=nombre-v3.scad&protected=true&unikey=a926126f-79e1-4363-aeeb-382ea6aede75',
     imageUrls: ['/products/initial-ornament-name.png'],
     copy: 'A personalized ornament built around a large initial, custom name text, and a finished hanging loop.',
     colors: productColors,
@@ -200,7 +205,8 @@ const products = [
     type: 'Door sign',
     category: 'Signs & Labels',
     variant: 'door-hanger',
-    sourceUrl: 'https://makerworld.com/en/models/2737514-customizable-door-hanger-text-svg-emoji-support#profileId-3035138',
+    sourceUrl:
+      'https://makerworld.com/en/models/2737514-customizable-door-hanger-text-svg-emoji-support#profileId-3035138',
     imageUrls: ['/products/custom-door-hanger.png'],
     copy: 'A customizable door hanger with text, SVG, or emoji-style artwork support for rooms, studios, and events.',
     colors: productColors,
@@ -249,7 +255,8 @@ const products = [
     type: 'Desk or wall nameplate',
     category: 'Business & Branding',
     variant: 'qr-plate',
-    sourceUrl: 'https://makerworld.com/en/models/2614672-customizable-qr-code-name-plate-stand-or-wall?from=search#profileId-2885404',
+    sourceUrl:
+      'https://makerworld.com/en/models/2614672-customizable-qr-code-name-plate-stand-or-wall?from=search#profileId-2885404',
     imageUrls: [
       'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2F0c7a09d0b146db1f.jpg&w=828',
       'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2F589c7773c818d9aa.jpg&w=828',
@@ -272,7 +279,14 @@ const products = [
   },
 ];
 
-const categories = ['Made-to-order products', 'Color choices', 'Custom text', 'Studio review', 'Small-batch finish', 'Personal details'];
+const categories = [
+  'Made-to-order products',
+  'Color choices',
+  'Custom text',
+  'Studio review',
+  'Small-batch finish',
+  'Personal details',
+];
 
 const processSteps = [
   {
@@ -318,19 +332,28 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <SiteShell>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/collection" element={<Collection />} />
-          <Route path="/collection/:slug/configure" element={<ProductConfigure />} />
-          <Route path="/collection/:slug" element={<ProductDetail />} />
-          <Route path="/process" element={<Process />} />
-          <Route path="/studio" element={<Studio />} />
-          <Route path="/quote" element={<Navigate to="/collection" replace />} />
-          <Route path="*" element={<Navigate to="/collection" replace />} />
-        </Routes>
-      </SiteShell>
+      <Routes>
+        <Route path="/admin/*" element={<AdminApp />} />
+        <Route path="*" element={<Storefront />} />
+      </Routes>
     </Router>
+  );
+}
+
+function Storefront() {
+  return (
+    <SiteShell>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/collection" element={<Collection />} />
+        <Route path="/collection/:slug/configure" element={<ProductConfigure />} />
+        <Route path="/collection/:slug" element={<ProductDetail />} />
+        <Route path="/process" element={<Process />} />
+        <Route path="/studio" element={<Studio />} />
+        <Route path="/quote" element={<Navigate to="/collection" replace />} />
+        <Route path="*" element={<Navigate to="/collection" replace />} />
+      </Routes>
+    </SiteShell>
   );
 }
 
@@ -393,9 +416,7 @@ function Home() {
 }
 
 function getRandomProducts(count) {
-  return [...products]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, count);
+  return [...products].sort(() => Math.random() - 0.5).slice(0, count);
 }
 
 function Hero() {
@@ -510,8 +531,8 @@ function ProcessPreview() {
         <p className="eyebrow">Configuration rhythm</p>
         <h2>A slower, more careful path to the right print.</h2>
         <p>
-          You begin with a product, choose the material and its available colors, then add the details that make it yours.
-          Gadjit Prints reviews the outline and follows up before production begins.
+          You begin with a product, choose the material and its available colors, then add the details that make it
+          yours. Gadjit Prints reviews the outline and follows up before production begins.
         </p>
         <NavLink className="text-link" to="/process">
           See the process <ArrowRight size={17} />
@@ -546,11 +567,7 @@ function Materials() {
           return (
             <div className="material-chip" key={material}>
               <Sparkles size={15} />
-              {materialInfo[materialKey] ? (
-                <MaterialBadge material={materialKey} selected />
-              ) : (
-                material
-              )}
+              {materialInfo[materialKey] ? <MaterialBadge material={materialKey} selected /> : material}
             </div>
           );
         })}
@@ -571,8 +588,8 @@ function StudioCallout() {
         <p className="eyebrow">Small studio, careful output</p>
         <h2>Custom prints without the complicated ordering process.</h2>
         <p>
-          The catalog can grow over time, while each order still gets reviewed, tuned, and printed around the details the
-          customer requested.
+          The catalog can grow over time, while each order still gets reviewed, tuned, and printed around the details
+          the customer requested.
         </p>
         <NavLink className="button button-primary" to="/studio">
           About the studio <ArrowRight size={18} />
@@ -586,7 +603,10 @@ function Collection() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [activeMaterial, setActiveMaterial] = useState('All');
   const categories = ['All', ...new Set(products.map((product) => product.category))];
-  const materialFilters = ['All', ...new Set(products.flatMap((product) => product.colors.flatMap((color) => color.materials)))];
+  const materialFilters = [
+    'All',
+    ...new Set(products.flatMap((product) => product.colors.flatMap((color) => color.materials))),
+  ];
   const filteredProducts = products.filter((product) => {
     const categoryMatch = activeCategory === 'All' || product.category === activeCategory;
     const materialMatch =
@@ -664,9 +684,21 @@ function Process() {
         ))}
       </div>
       <div className="note-grid">
-        <Note icon={<PenTool />} title="Content options" text="Products can support names, initials, QR codes, labels, phrases, icons, or other product-specific details." />
-        <Note icon={<Layers3 />} title="Configuration by product" text="Each item has its own adjustable details: layouts, hooks, tags, signs, labels, sizing, mounting, or set count." />
-        <Note icon={<Check />} title="Made after selection" text="Orders are not pulled from a shelf. They are reviewed, printed, and finished after the customer sends the outline." />
+        <Note
+          icon={<PenTool />}
+          title="Content options"
+          text="Products can support names, initials, QR codes, labels, phrases, icons, or other product-specific details."
+        />
+        <Note
+          icon={<Layers3 />}
+          title="Configuration by product"
+          text="Each item has its own adjustable details: layouts, hooks, tags, signs, labels, sizing, mounting, or set count."
+        />
+        <Note
+          icon={<Check />}
+          title="Made after selection"
+          text="Orders are not pulled from a shelf. They are reviewed, printed, and finished after the customer sends the outline."
+        />
       </div>
     </PageFrame>
   );
@@ -692,12 +724,16 @@ function Studio() {
             makes a made-to-order piece worthwhile.
           </p>
           <p>
-            As a small Houston-area project, Gadjit Prints also has a quiet connection to <a className="text-link" href="https://gadjit.net" target="_blank" rel="noreferrer">Gadjit</a>,
-            a camera business with more than 10 years of experience around used and open-box camera gear.
+            As a small Houston-area project, Gadjit Prints also has a quiet connection to{' '}
+            <a className="text-link" href="https://gadjit.net" target="_blank" rel="noreferrer">
+              Gadjit
+            </a>
+            , a camera business with more than 10 years of experience around used and open-box camera gear.
           </p>
           <p>
-            Every print is made after the order is outlined, then checked and fine tuned before production. Wait times can
-            be longer than a mass-production shop, but the goal is a piece that looks and feels the way you wanted it.
+            Every print is made after the order is outlined, then checked and fine tuned before production. Wait times
+            can be longer than a mass-production shop, but the goal is a piece that looks and feels the way you wanted
+            it.
           </p>
           <div className="value-list">
             <span>Custom print service</span>
@@ -758,11 +794,7 @@ function ProductCard({ product }) {
 
   return (
     <article className="catalog-card reveal">
-      <NavLink
-        className="catalog-card-link"
-        to={`/collection/${product.slug}`}
-        aria-label={`View ${product.title}`}
-      />
+      <NavLink className="catalog-card-link" to={`/collection/${product.slug}`} aria-label={`View ${product.title}`} />
       <div className="catalog-card-title">
         {product.badge ? <span className="product-badge">{product.badge}</span> : null}
         <h3>{product.title}</h3>
@@ -860,21 +892,25 @@ function ProductDetailContent({ product }) {
                   <img src={imageUrl} alt="" loading="lazy" decoding="async" />
                 </button>
               ))
-            : [materialColors[0], materialColors[1], materialColors[2], selectedColor].filter(Boolean).map((color, index) => (
-                <button
-                  className={color.name === selectedColor.name ? 'is-active' : ''}
-                  key={`${color.name}-${index}`}
-                  type="button"
-                  onClick={() => setSelectedColorName(color.name)}
-                  aria-label={`View ${product.title} in ${color.name}`}
-                >
-                  <ProductVisual variant={product.variant} tone={color.swatch} />
-                </button>
-              ))}
+            : [materialColors[0], materialColors[1], materialColors[2], selectedColor]
+                .filter(Boolean)
+                .map((color, index) => (
+                  <button
+                    className={color.name === selectedColor.name ? 'is-active' : ''}
+                    key={`${color.name}-${index}`}
+                    type="button"
+                    onClick={() => setSelectedColorName(color.name)}
+                    aria-label={`View ${product.title} in ${color.name}`}
+                  >
+                    <ProductVisual variant={product.variant} tone={color.swatch} />
+                  </button>
+                ))}
         </aside>
         <section className="detail-gallery">
           <ProductMedia product={product} selectedColor={selectedColor} imageIndex={selectedImageIndex} />
-          <span>{hasProductPhotos ? `Reference photo ${selectedImageIndex + 1}` : `Selected finish: ${selectedColor.name}`}</span>
+          <span>
+            {hasProductPhotos ? `Reference photo ${selectedImageIndex + 1}` : `Selected finish: ${selectedColor.name}`}
+          </span>
         </section>
         <section className="detail-main">
           <p className="eyebrow">{product.category}</p>
@@ -939,7 +975,11 @@ function ProductDetailContent({ product }) {
             />
           </OptionGroup>
           <OptionGroup title={`${selectedMaterial} colors`}>
-            <ColorSwatches colors={materialColors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
+            <ColorSwatches
+              colors={materialColors}
+              selectedColor={selectedColorName}
+              onSelectColor={setSelectedColorName}
+            />
           </OptionGroup>
           <div className="buybox-selected">
             <strong>Current configuration</strong>
@@ -1049,16 +1089,18 @@ function ProductConfigureContent({ product }) {
               selectedMaterial={selectedMaterial}
               onSelectMaterial={setSelectedMaterial}
             />
-            <ColorSwatches colors={materialColors} selectedColor={selectedColorName} onSelectColor={setSelectedColorName} />
+            <ColorSwatches
+              colors={materialColors}
+              selectedColor={selectedColorName}
+              onSelectColor={setSelectedColorName}
+            />
             <div className="buybox-selected">
               <strong>{product.configureType === 'qr-stand' ? 'Selected base plate' : 'Selected finish'}</strong>
               <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
             </div>
           </ConfigureGroup>
 
-          {product.configureType === 'qr-stand' ? (
-            <PrintDimensions product={product} layout={form.layout} />
-          ) : null}
+          {product.configureType === 'qr-stand' ? <PrintDimensions product={product} layout={form.layout} /> : null}
 
           {product.configureType === 'qr-stand' ? (
             <QrStandConfigureFields form={form} updateField={updateField} />
@@ -1073,7 +1115,10 @@ function ProductConfigureContent({ product }) {
             </label>
             <label className="field-control">
               <span>Your email or phone</span>
-              <input value={form.customerContact} onChange={(event) => updateField('customerContact', event.target.value)} />
+              <input
+                value={form.customerContact}
+                onChange={(event) => updateField('customerContact', event.target.value)}
+              />
             </label>
           </ConfigureGroup>
         </section>
@@ -1104,7 +1149,8 @@ function ProductConfigureContent({ product }) {
           </div>
           <p className="configure-note">
             Email apps cannot attach logo files automatically. After the draft opens, attach any SVG, PNG, JPEG, or
-            reference file you want used. The studio may request additional files or changes after reviewing your outline.
+            reference file you want used. The studio may request additional files or changes after reviewing your
+            outline.
           </p>
         </aside>
       </div>
@@ -1126,11 +1172,19 @@ function GenericConfigureFields({ product, form, updateField }) {
         </label>
         <label className="field-control">
           <span>QR code link or content</span>
-          <input value={form.qrContent} onChange={(event) => updateField('qrContent', event.target.value)} placeholder="Website, profile, contact card, or message" />
+          <input
+            value={form.qrContent}
+            onChange={(event) => updateField('qrContent', event.target.value)}
+            placeholder="Website, profile, contact card, or message"
+          />
         </label>
         <label className="field-control">
           <span>Logo or file notes</span>
-          <input value={form.logoNotes} onChange={(event) => updateField('logoNotes', event.target.value)} placeholder="Describe logo, SVG, image, or file you will send" />
+          <input
+            value={form.logoNotes}
+            onChange={(event) => updateField('logoNotes', event.target.value)}
+            placeholder="Describe logo, SVG, image, or file you will send"
+          />
         </label>
       </ConfigureGroup>
 
@@ -1151,11 +1205,19 @@ function GenericConfigureFields({ product, form, updateField }) {
         <PrintDimensions product={product} layout={form.layout} />
         <label className="field-control">
           <span>Requested size</span>
-          <input value={form.size} onChange={(event) => updateField('size', event.target.value)} placeholder="Example: 4 in wide, standard, larger tag" />
+          <input
+            value={form.size}
+            onChange={(event) => updateField('size', event.target.value)}
+            placeholder="Example: 4 in wide, standard, larger tag"
+          />
         </label>
         <label className="field-control">
           <span>Notes for the studio</span>
-          <textarea value={form.notes} onChange={(event) => updateField('notes', event.target.value)} placeholder="Placement, spelling, deadline, gift notes, usage, or anything specific." />
+          <textarea
+            value={form.notes}
+            onChange={(event) => updateField('notes', event.target.value)}
+            placeholder="Placement, spelling, deadline, gift notes, usage, or anything specific."
+          />
         </label>
       </ConfigureGroup>
     </>
@@ -1192,27 +1254,55 @@ function QrStandConfigureFields({ form, updateField }) {
       <ConfigureGroup title="Front content">
         <label className="field-control">
           <span>Top text</span>
-          <input value={form.topText} onChange={(event) => updateField('topText', event.target.value)} placeholder="Example: Follow Us!, Pay With Zelle, Scan Here" />
+          <input
+            value={form.topText}
+            onChange={(event) => updateField('topText', event.target.value)}
+            placeholder="Example: Follow Us!, Pay With Zelle, Scan Here"
+          />
         </label>
         <label className="field-control">
           <span>Bottom text</span>
-          <input value={form.bottomText} onChange={(event) => updateField('bottomText', event.target.value)} placeholder="Used when no bottom logo is requested" />
+          <input
+            value={form.bottomText}
+            onChange={(event) => updateField('bottomText', event.target.value)}
+            placeholder="Used when no bottom logo is requested"
+          />
         </label>
         <label className="field-control">
           <span>Bottom logo notes</span>
-          <input value={form.bottomLogoNotes} onChange={(event) => updateField('bottomLogoNotes', event.target.value)} placeholder="Optional. Replaces bottom text when used." />
+          <input
+            value={form.bottomLogoNotes}
+            onChange={(event) => updateField('bottomLogoNotes', event.target.value)}
+            placeholder="Optional. Replaces bottom text when used."
+          />
         </label>
         <p className="field-note">If a bottom logo is used, it replaces the bottom text area.</p>
         <label className="field-control">
           <span>QR code link or content</span>
-          <input value={form.qrContent} onChange={(event) => updateField('qrContent', event.target.value)} placeholder="Payment link, social profile, menu, contact card, or website" />
+          <input
+            value={form.qrContent}
+            onChange={(event) => updateField('qrContent', event.target.value)}
+            placeholder="Payment link, social profile, menu, contact card, or website"
+          />
         </label>
       </ConfigureGroup>
 
       <ConfigureGroup title="Color zones">
-        <ColorZonePicker label="Text box color" value={form.textBoxColor} onChange={(value) => updateField('textBoxColor', value)} />
-        <ColorZonePicker label="QR code color" value={form.qrColor} onChange={(value) => updateField('qrColor', value)} />
-        <ColorZonePicker label="Rear ornament color" value={form.rearOrnamentColor} onChange={(value) => updateField('rearOrnamentColor', value)} />
+        <ColorZonePicker
+          label="Text box color"
+          value={form.textBoxColor}
+          onChange={(value) => updateField('textBoxColor', value)}
+        />
+        <ColorZonePicker
+          label="QR code color"
+          value={form.qrColor}
+          onChange={(value) => updateField('qrColor', value)}
+        />
+        <ColorZonePicker
+          label="Rear ornament color"
+          value={form.rearOrnamentColor}
+          onChange={(value) => updateField('rearOrnamentColor', value)}
+        />
       </ConfigureGroup>
 
       <ConfigureGroup title="Rear ornament and notes">
@@ -1230,11 +1320,19 @@ function QrStandConfigureFields({ form, updateField }) {
         </div>
         <label className="field-control">
           <span>Ornament name or idea</span>
-          <input value={form.size} onChange={(event) => updateField('size', event.target.value)} placeholder="Example: wizard hat, camera, flower, logo shape, simple initials" />
+          <input
+            value={form.size}
+            onChange={(event) => updateField('size', event.target.value)}
+            placeholder="Example: wizard hat, camera, flower, logo shape, simple initials"
+          />
         </label>
         <label className="field-control">
           <span>Additional notes</span>
-          <textarea value={form.notes} onChange={(event) => updateField('notes', event.target.value)} placeholder="Business use, placement, deadline, logo file details, ornament idea, or anything specific." />
+          <textarea
+            value={form.notes}
+            onChange={(event) => updateField('notes', event.target.value)}
+            placeholder="Business use, placement, deadline, logo file details, ornament idea, or anything specific."
+          />
         </label>
       </ConfigureGroup>
     </>
@@ -1432,7 +1530,9 @@ function getConfigurationSummary(product, selectedColor, selectedMaterial, form)
 
 function getConfigurationEmailHref(product, summary) {
   const subject = encodeURIComponent(`Gadjit Prints configuration: ${product.title}`);
-  const body = encodeURIComponent(`${summary}\n\nPlease attach any logo, SVG, image, or reference files before sending.`);
+  const body = encodeURIComponent(
+    `${summary}\n\nPlease attach any logo, SVG, image, or reference files before sending.`
+  );
   return `mailto:${studioEmail}?subject=${subject}&body=${body}`;
 }
 
@@ -1620,9 +1720,7 @@ function ProductOptions({ product, selectedColor, selectedMaterial }) {
     <div className="product-options">
       <div>
         <strong>Selected</strong>
-        <p>
-          {getConfigurationLabel(selectedColor, selectedMaterial)}
-        </p>
+        <p>{getConfigurationLabel(selectedColor, selectedMaterial)}</p>
       </div>
       <div>
         <strong>Available colors</strong>

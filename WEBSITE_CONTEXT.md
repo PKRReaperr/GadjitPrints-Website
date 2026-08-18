@@ -127,7 +127,10 @@ Use `getColorsForMaterial(product, material)` to derive the material-specific co
 The product model maps color names into full color objects, for example:
 
 ```js
-colors: ['Bone', 'Charcoal', 'Amber', 'Stone'].map((name) => ({ name, ...colorLibrary[name] }))
+colors: ['Bone', 'Charcoal', 'Amber', 'Stone'].map((name) => ({
+  name,
+  ...colorLibrary[name],
+}));
 ```
 
 When adding a new product, prefer reusing existing color library names. If adding a new color, update `colorLibrary` first and include realistic available materials.
@@ -319,6 +322,8 @@ Important CSS areas:
 - Material UI: `.material-badge`, `.material-tooltip`.
 
 ## Backend Structure
+
+The `feature/admin-product-radar-beta` branch adds Vercel Functions under `api/`, request-time admin protection in `middleware.ts`, and a PostgreSQL/Drizzle persistence layer under `src/server/`. See `ADMIN_PRODUCT_RADAR.md`. Production-safe defaults keep scheduled Radar and Etsy draft writes disabled.
 
 There is currently no custom backend.
 
