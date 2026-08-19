@@ -262,21 +262,43 @@ function Overview() {
         title="Overview"
         copy="Your weekly snapshot of opportunities, event timing, and listing readiness."
       />
-      <section className="metric-grid" aria-label="Operations summary">
-        <Metric
-          icon={Activity}
-          label="Active events"
-          value={data.events.filter((e) => e.status === 'active').length}
-          note="Selling windows open"
-        />
-        <Metric
-          icon={Clock3}
-          label="Coming next"
-          value={data.events.filter((e) => e.status === 'coming_soon').length}
-          note="Prepare production"
-        />
-        <Metric icon={PackageCheck} label="Ready to draft" value={ready} note="Rights verified" />
-        <Metric icon={FileText} label="Listing drafts" value={data.listings.length} note="In your workspace" />
+      <section className="overview-summary" aria-label="Operations summary">
+        <div className="summary-group">
+          <header>
+            <CalendarDays size={17} />
+            <div>
+              <h2>Event timing</h2>
+              <p>What to make and prepare for</p>
+            </div>
+          </header>
+          <div className="summary-group-grid">
+            <Metric
+              icon={Activity}
+              label="Active events"
+              value={data.events.filter((e) => e.status === 'active').length}
+              note="Selling windows open"
+            />
+            <Metric
+              icon={Clock3}
+              label="Coming next"
+              value={data.events.filter((e) => e.status === 'coming_soon').length}
+              note="Prepare production"
+            />
+          </div>
+        </div>
+        <div className="summary-group">
+          <header>
+            <FileText size={17} />
+            <div>
+              <h2>Listing workflow</h2>
+              <p>What is ready to move forward</p>
+            </div>
+          </header>
+          <div className="summary-group-grid">
+            <Metric icon={PackageCheck} label="Ready to draft" value={ready} note="Rights verified" />
+            <Metric icon={FileText} label="Listing drafts" value={data.listings.length} note="In your workspace" />
+          </div>
+        </div>
       </section>
       <div className="overview-grid">
         <Section title="Next best actions" subtitle="Move the weekly workflow forward">
