@@ -25,6 +25,7 @@
     "@vercel/blob": "^2.8.0",
     "@vercel/functions": "^3.9.3",
     "@vitejs/plugin-react": "^6.0.5",
+    "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^0.468.0",
     "openai": "^7.5.0",

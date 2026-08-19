@@ -1,4 +1,7 @@
 import { defineConfig } from 'drizzle-kit';
+import { config as loadEnv } from 'dotenv';
+
+if (!process.env.DATABASE_URL) loadEnv({ path: '.env.local', quiet: true });
 
 export default defineConfig({
   schema: './src/server/schema.ts',
