@@ -31,7 +31,26 @@ export function isCronAuthorized(header: string | undefined, secret = process.en
   return Boolean(secret && header === `Bearer ${secret}`);
 }
 
-const radarPrompt = `Research current worldwide seasonal and cultural product opportunities for a small 3D-print shop. Only recommend either (1) paid models with a purchasable license explicitly allowing physical-print sales, or (2) free models whose source explicitly permits both commercial physical-print sales and remix/derivative work. Reject NonCommercial, NoDerivatives, personal-use-only, fan art, branded/logo/team/character designs, unclear terms, and unsupported claims. Keep every recommendation needs_review and every license unverified even when evidence appears strong. Use source URLs and current dates. Never invent permission. Favor low-IP-risk generic concepts and note cultural sensitivity. Return no more than 8 recommendations.`;
+export function isExternalRadarRecommendation(product: {
+  creator?: string | null;
+  source?: string | null;
+  modelSourceUrl?: string | null;
+}) {
+  if ((product.creator ?? '').toLowerCase().includes('gadjit')) return false;
+  const source = product.modelSourceUrl ?? product.source;
+  try {
+    const url = new URL(source ?? '');
+    return (
+      ['http:', 'https:'].includes(url.protocol) &&
+      url.hostname !== 'example.com' &&
+      !url.hostname.endsWith('.example.com')
+    );
+  } catch {
+    return false;
+  }
+}
+
+const radarPrompt = `Research current worldwide seasonal and cultural product opportunities for a small 3D-print shop. Recommend independent third-party models only; never include Gadjit Prints products, its catalog, or any in-house model. Only recommend either (1) paid models with a purchasable license explicitly allowing physical-print sales, or (2) free models whose source explicitly permits both commercial physical-print sales and remix/derivative work. Reject NonCommercial, NoDerivatives, personal-use-only, fan art, branded/logo/team/character designs, unclear terms, placeholder URLs, and unsupported claims. Keep every recommendation needs_review and every license unverified even when evidence appears strong. Use the original model-source URL and current dates. Set thumbnailUrl and thumbnailSource to null because Radar is intentionally text-only. Never invent permission. Favor low-IP-risk generic concepts and note cultural sensitivity. Return no more than 8 recommendations.`;
 
 export async function startRadarRun(input: { idempotencyKey: string; trigger: 'cron' | 'manual' }) {
   const db = getDb();

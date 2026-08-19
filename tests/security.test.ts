@@ -14,7 +14,12 @@ import {
   refreshEtsyToken,
   validateOAuthState,
 } from '../src/server/etsy.js';
-import { isCronAuthorized, isDenverRadarWindow, weeklyIdempotencyKey } from '../src/server/radar.js';
+import {
+  isCronAuthorized,
+  isDenverRadarWindow,
+  isExternalRadarRecommendation,
+  weeklyIdempotencyKey,
+} from '../src/server/radar.js';
 import { cookie, encryptSecret, redact, sha256 } from '../src/server/security.js';
 import {
   assertDraftOnlyPayload,
@@ -243,5 +248,28 @@ describe('media upload safety', () => {
       height: 900,
     });
     expect(() => readImageDimensions(Buffer.from('not an image'), 'image/png')).toThrow('INVALID_PNG');
+  });
+});
+
+describe('Product Radar source separation', () => {
+  it('accepts real external model links and rejects internal or placeholder records', () => {
+    expect(
+      isExternalRadarRecommendation({
+        creator: 'Independent Maker',
+        modelSourceUrl: 'https://www.printables.com/model/123',
+      })
+    ).toBe(true);
+    expect(
+      isExternalRadarRecommendation({
+        creator: 'Gadjit Prints',
+        modelSourceUrl: 'https://www.printables.com/model/123',
+      })
+    ).toBe(false);
+    expect(isExternalRadarRecommendation({ creator: 'Independent Maker', source: 'Gadjit in-house model' })).toBe(
+      false
+    );
+    expect(
+      isExternalRadarRecommendation({ creator: 'Sample creator', modelSourceUrl: 'https://example.com/sample-model' })
+    ).toBe(false);
   });
 });

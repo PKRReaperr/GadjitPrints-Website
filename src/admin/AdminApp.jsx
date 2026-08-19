@@ -20,18 +20,15 @@ import {
   Clock3,
   FileText,
   Gauge,
-  Grid3X3,
   ExternalLink,
   ImagePlus,
   LayoutDashboard,
   ListFilter,
-  List,
   LoaderCircle,
   LogOut,
   Menu,
   PackageCheck,
   Play,
-  Search,
   Settings,
   ShieldCheck,
   Store,
@@ -356,58 +353,38 @@ function Overview() {
 
 function RadarDashboard() {
   const { loading, data, error, reload } = useDashboard();
-  const [params, setParams] = useSearchParams();
   const [runState, setRunState] = useState(null);
-  const [view, setView] = useState('grid');
   if (loading) return <PageSkeleton />;
   if (error) return <ErrorState message={error} retry={reload} />;
-  const products = data.products ?? [];
-  const query = params.get('q') ?? '';
-  const category = params.get('category') ?? 'all';
-  const status = params.get('status') ?? 'all';
-  const complexity = params.get('complexity') ?? 'all';
-  const region = params.get('region') ?? 'all';
-  const event = params.get('event') ?? 'all';
-  const cost = params.get('cost') ?? 'all';
-  const sort = params.get('sort') ?? 'score';
-  const filtered = products
-    .filter(
-      (p) =>
-        (!query || `${p.title} ${p.hook} ${p.creator}`.toLowerCase().includes(query.toLowerCase())) &&
-        (category === 'all' || p.category === category) &&
-        (status === 'all' || p.review === status || p.status === status) &&
-        (complexity === 'all' || p.complexity?.toLowerCase() === complexity) &&
-        (region === 'all' || p.region === region) &&
-        (event === 'all' || p.hook === event) &&
-        (cost === 'all' ||
-          (cost === 'under_20' && Number(p.price) < 20) ||
-          (cost === '20_plus' && Number(p.price) >= 20))
-    )
-    .sort((a, b) =>
-      sort === 'print'
-        ? (a.printTime ?? 99999) - (b.printTime ?? 99999)
-        : sort === 'event'
-          ? a.hook.localeCompare(b.hook)
-          : sort === 'title'
-            ? a.title.localeCompare(b.title)
-            : b.score - a.score
-    );
-  const set = (key, value) => {
-    const next = new URLSearchParams(params);
-    value === 'all' || !value ? next.delete(key) : next.set(key, value);
-    setParams(next);
-  };
-  const activeFilters = [...params.entries()].filter(([key]) => key !== 'sort');
-  const clearFilters = () => {
-    const next = new URLSearchParams();
-    if (sort !== 'score') next.set('sort', sort);
-    setParams(next);
-  };
+  const recommendations = (data.products ?? [])
+    .filter(isExternalResearchRecommendation)
+    .sort((a, b) => b.score - a.score);
   async function runRadar() {
     if (runState?.kind === 'running') return;
     setRunState({ kind: 'running', message: data.fixtureMode ? 'Starting a safe sample run…' : 'Starting Radar…' });
     try {
       const result = await api('/api/admin/radar/run', { method: 'POST' });
+      if (!data.fixtureMode && result.run?.id) {
+        setRunState({ kind: 'running', message: 'Radar is researching external model sources…' });
+        for (let attempt = 0; attempt < 12; attempt += 1) {
+          await new Promise((resolve) => setTimeout(resolve, 2500));
+          const statusResult = await api(`/api/admin/radar/runs/${result.run.id}`);
+          if (statusResult.run?.status === 'completed') {
+            setRunState({ kind: 'success', message: 'Research complete. External recommendations are ready below.' });
+            reload();
+            return;
+          }
+          if (['failed', 'partial'].includes(statusResult.run?.status)) {
+            throw new Error('Radar research did not complete. Check the recent run details and try again.');
+          }
+        }
+        setRunState({
+          kind: 'neutral',
+          message: 'Research is still running. Refresh this page in a moment to see the recommendations.',
+        });
+        reload();
+        return;
+      }
       setRunState({
         kind: 'success',
         message: result.duplicate
@@ -421,16 +398,12 @@ function RadarDashboard() {
       setRunState({ kind: 'error', message: e.message });
     }
   }
-  const shortlist = [...products]
-    .filter((p) => p.review === 'approved' && p.verified === 'verified' && /^https?:\/\//.test(p.source ?? ''))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
   return (
     <>
       <PageHeader
         eyebrow="Weekly opportunity intelligence"
         title="Product Radar"
-        copy="A review-first queue of seasonal product opportunities, licenses, and Etsy readiness."
+        copy="External print recommendations found through Radar research, linked directly to their original sources."
         actions={
           <div className="radar-run-action">
             <button className="admin-button primary" onClick={runRadar} disabled={runState?.kind === 'running'}>
@@ -452,178 +425,51 @@ function RadarDashboard() {
       )}
       <section className="metric-grid">
         <Metric
-          icon={Activity}
-          label="Active events"
-          value={data.events.filter((e) => e.status === 'active').length}
-          note="Selling window open"
-        />
-        <Metric
-          icon={Clock3}
-          label="Coming next"
-          value={data.events.filter((e) => e.status === 'coming_soon').length}
-          note="Prepare production"
-        />
-        <Metric
           icon={PackageCheck}
-          label="Draft ready"
-          value={products.filter((p) => p.review === 'approved' && p.verified === 'verified').length}
-          note="Human approved"
+          label="Research results"
+          value={recommendations.length}
+          note="External sources only"
+        />
+        <Metric
+          icon={ShieldCheck}
+          label="License verified"
+          value={recommendations.filter((p) => p.verified === 'verified').length}
+          note="Human reviewed"
         />
         <Metric
           icon={AlertTriangle}
           label="Needs review"
-          value={products.filter((p) => p.verified !== 'verified' || p.risk !== 'low').length}
-          note="License or IP"
+          value={recommendations.filter((p) => p.review === 'needs_review' || p.verified !== 'verified').length}
+          note="License or IP check"
+        />
+        <Metric
+          icon={Clock3}
+          label="Latest research"
+          value={data.lastSuccessfulRun ? formatShortDate(data.lastSuccessfulRun.date) : '—'}
+          note="Last successful run"
         />
       </section>
-      <Section title="Make This Week" subtitle="Approved recommendations with verified rights and direct model links">
-        <div className="shortlist">
-          {shortlist.length ? (
-            shortlist.map((product, index) => <MakeThisWeekItem key={product.id} product={product} rank={index + 1} />)
+      <Section
+        title="Recommended prints"
+        subtitle="Independent external models found by Radar—never Gadjit Prints catalog products"
+      >
+        <div className="research-list">
+          {recommendations.length ? (
+            recommendations.map((product, index) => (
+              <ResearchRecommendation key={product.id} product={product} rank={index + 1} />
+            ))
           ) : (
             <EmptyState
-              title="No linked print files are cleared yet"
-              copy="A recommendation appears here only after both its review and license are approved and it has a direct model-source link."
+              title="No external research recommendations yet"
+              copy={
+                data.fixtureMode
+                  ? 'Sample mode does not perform live research. Configure OpenAI, turn off fixture mode, and run Radar to populate this list with real source links.'
+                  : 'Run Radar to research current external models and add their original source links here.'
+              }
             />
           )}
         </div>
       </Section>
-      <EventBands events={data.events} />
-      <Section title="Opportunity queue" subtitle={`${filtered.length} of ${products.length} recommendations`}>
-        <div className="filter-bar">
-          <label className="search-control">
-            <Search size={17} />
-            <span className="sr-only">Search recommendations</span>
-            <input
-              value={query}
-              onChange={(e) => set('q', e.target.value)}
-              placeholder="Search product, event, creator…"
-            />
-          </label>
-          <Select
-            label="License category"
-            value={category}
-            onChange={(e) => set('category', e.target.value)}
-            options={[
-              ['all', 'All license categories'],
-              ['paid_commercial', 'Paid commercial'],
-              ['free_commercial_remixable', 'Free commercial + remixable'],
-            ]}
-          />
-          <Select
-            label="Event"
-            value={event}
-            onChange={(e) => set('event', e.target.value)}
-            options={[
-              ['all', 'All events'],
-              ...[...new Set(products.map((p) => p.hook))].map((value) => [value, value]),
-            ]}
-          />
-          <Select
-            label="Country or region"
-            value={region}
-            onChange={(e) => set('region', e.target.value)}
-            options={[
-              ['all', 'All regions'],
-              ...[...new Set(products.map((p) => p.region))].map((value) => [value, value]),
-            ]}
-          />
-          <Select
-            label="Suggested price"
-            value={cost}
-            onChange={(e) => set('cost', e.target.value)}
-            options={[
-              ['all', 'All prices'],
-              ['under_20', 'Under $20'],
-              ['20_plus', '$20 and up'],
-            ]}
-          />
-          <Select
-            label="Review status"
-            value={status}
-            onChange={(e) => set('status', e.target.value)}
-            options={[
-              ['all', 'All statuses'],
-              ['approved', 'Approved'],
-              ['needs_review', 'Needs review'],
-              ['rejected', 'Rejected'],
-            ]}
-          />
-          <Select
-            label="Complexity"
-            value={complexity}
-            onChange={(e) => set('complexity', e.target.value)}
-            options={[
-              ['all', 'All complexity'],
-              ['low', 'Low complexity'],
-              ['medium', 'Medium complexity'],
-              ['high', 'High complexity'],
-            ]}
-          />
-          <Select
-            label="Sort"
-            value={sort}
-            onChange={(e) => set('sort', e.target.value)}
-            options={[
-              ['score', 'Rank / opportunity score'],
-              ['print', 'Print time'],
-              ['event', 'Event'],
-              ['title', 'Title'],
-            ]}
-          />
-          <div className="view-toggle" aria-label="Opportunity view">
-            <button
-              className={view === 'grid' ? 'active' : ''}
-              onClick={() => setView('grid')}
-              aria-label="Card view"
-              aria-pressed={view === 'grid'}
-            >
-              <Grid3X3 size={16} />
-            </button>
-            <button
-              className={view === 'list' ? 'active' : ''}
-              onClick={() => setView('list')}
-              aria-label="Compact view"
-              aria-pressed={view === 'list'}
-            >
-              <List size={17} />
-            </button>
-          </div>
-        </div>
-        {activeFilters.length > 0 && (
-          <div className="active-filters" aria-label="Active filters">
-            {activeFilters.map(([key, value]) => (
-              <button key={key} onClick={() => set(key, key === 'q' ? '' : 'all')}>
-                <span>
-                  {key}: {value.replaceAll('_', ' ')}
-                </span>
-                <X size={14} />
-              </button>
-            ))}
-            <button className="clear-filters" onClick={clearFilters}>
-              Clear all
-            </button>
-          </div>
-        )}
-        <div className={`product-grid ${view === 'list' ? 'compact' : ''}`}>
-          {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-          {!filtered.length && (
-            <EmptyState title="No matching opportunities" copy="Try removing one or more filters." />
-          )}
-        </div>
-      </Section>
-      <div className="two-column">
-        <LicenseColumn
-          title="Paid Commercial Models"
-          products={products.filter((p) => p.category === 'paid_commercial')}
-        />
-        <LicenseColumn
-          title="Free Commercial + Remixable Models"
-          products={products.filter((p) => p.category === 'free_commercial_remixable')}
-        />
-      </div>
       <Section
         title="Recent radar runs"
         subtitle={
@@ -650,124 +496,30 @@ function RadarDashboard() {
   );
 }
 
-function MakeThisWeekItem({ product, rank }) {
+function ResearchRecommendation({ product, rank }) {
   return (
-    <a className="make-week-item" href={product.source} target="_blank" rel="noreferrer">
-      <span className="make-week-rank mono">0{rank}</span>
-      <div>
+    <a className="research-item" href={product.source} target="_blank" rel="noreferrer">
+      <span className="research-rank mono">{String(rank).padStart(2, '0')}</span>
+      <div className="research-copy">
         <div className="card-kicker">
           <Status value={product.review} />
           <span className="mono">{product.score}/100</span>
         </div>
         <h3>{product.title}</h3>
-        <p>
-          {product.hook} · {product.region}
-        </p>
+        <p>{product.concept}</p>
         <div className="card-meta">
+          <span>{product.creator}</span>
+          <span>{product.hook}</span>
           <span>{product.complexity} complexity</span>
           <span>{product.printTime ? `${product.printTime} min` : 'Time unknown'}</span>
           <span>{product.license}</span>
         </div>
       </div>
-      <span className="make-week-link">
-        Open print file <ExternalLink size={16} />
+      <span className="research-source">
+        <small>{sourceHostname(product.source)}</small>
+        Open original source <ExternalLink size={16} />
       </span>
     </a>
-  );
-}
-
-function EventBands({ events }) {
-  return (
-    <div className="event-bands">
-      {[
-        ['active', 'Active Events'],
-        ['coming_soon', 'Coming Next'],
-        ['plan_early', 'Plan Early'],
-      ].map(([status, title]) => (
-        <section key={status}>
-          <div>
-            <span className={`event-dot ${status}`} />
-            <h2>{title}</h2>
-          </div>
-          {events
-            .filter((e) => e.status === status)
-            .map((e) => (
-              <article key={e.id}>
-                <span>{formatDate(e.startDate)}</span>
-                <strong>{e.name}</strong>
-                <p>{e.summary}</p>
-              </article>
-            ))}
-        </section>
-      ))}
-    </div>
-  );
-}
-
-function ProductCard({ product, rank, featured = false }) {
-  return (
-    <article className={`radar-card ${featured ? 'featured' : ''}`}>
-      {rank && <span className="rank">0{rank}</span>}
-      <Thumbnail product={product} />
-      <div className="radar-card-body">
-        <div className="card-kicker">
-          <Status value={product.review} />
-          <span className="mono">{product.score}/100</span>
-        </div>
-        <h3>{product.title}</h3>
-        <p>
-          {product.hook} · {product.region}
-        </p>
-        <div className="card-meta">
-          <span>{product.complexity} complexity</span>
-          <span>{product.printTime ? `${product.printTime} min` : 'Time unknown'}</span>
-          <span>{product.category === 'paid_commercial' ? 'Paid license' : 'Free + remixable'}</span>
-        </div>
-        <div className="license-line">
-          <ShieldCheck size={15} />
-          <span>{product.license}</span>
-          <Status value={product.verified} />
-        </div>
-        <p className={`risk ${product.risk}`}>
-          <AlertTriangle size={14} /> {product.riskNote}
-        </p>
-      </div>
-    </article>
-  );
-}
-
-function Thumbnail({ product }) {
-  return (
-    <div className="product-thumb">
-      {product.thumbnail && product.thumbnailApproved ? (
-        <img src={product.thumbnail} alt={`${product.title} approved product reference`} loading="lazy" />
-      ) : (
-        <div className="thumb-fallback">
-          <PackageCheck />
-          <span>No approved image</span>
-        </div>
-      )}
-      <span className="thumb-label">{product.thumbnailApproved ? 'Approved photo' : 'Source image blocked'}</span>
-    </div>
-  );
-}
-
-function LicenseColumn({ title, products }) {
-  return (
-    <Section title={title} subtitle={`${products.length} exact-category records`}>
-      <div className="license-list">
-        {products.map((p) => (
-          <div key={p.id}>
-            <strong>{p.title}</strong>
-            <Status value={p.verified} />
-            <p>{p.commercialPermission}</p>
-            <span className="mono">
-              {p.quantityLimit || 'No limit stated'} · {p.remix}
-            </span>
-          </div>
-        ))}
-      </div>
-    </Section>
   );
 }
 
@@ -1590,6 +1342,36 @@ function formatDate(value) {
     day: 'numeric',
     year: 'numeric',
   });
+}
+
+function formatShortDate(value) {
+  if (!value) return '—';
+  return new Date(value.length === 10 ? `${value}T12:00:00` : value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function isExternalResearchRecommendation(product) {
+  if ((product.creator ?? '').toLowerCase().includes('gadjit')) return false;
+  try {
+    const url = new URL(product.source);
+    return (
+      ['http:', 'https:'].includes(url.protocol) &&
+      url.hostname !== 'example.com' &&
+      !url.hostname.endsWith('.example.com')
+    );
+  } catch {
+    return false;
+  }
+}
+
+function sourceHostname(source) {
+  try {
+    return new URL(source).hostname.replace(/^www\./, '');
+  } catch {
+    return 'External source';
+  }
 }
 
 function eventCountdown(event) {
