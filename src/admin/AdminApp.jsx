@@ -19,10 +19,13 @@ import {
   Copy,
   Clock3,
   FileText,
+  Gauge,
+  Grid3X3,
   ExternalLink,
   ImagePlus,
   LayoutDashboard,
   ListFilter,
+  List,
   LoaderCircle,
   LogOut,
   Menu,
@@ -38,10 +41,11 @@ import {
 import '../admin.css';
 
 const navigation = [
+  { to: '/admin/overview', label: 'Overview', icon: Gauge },
   { to: '/admin/product-radar', label: 'Product Radar', icon: LayoutDashboard },
-  { to: '/admin/product-radar/events', label: 'Events', icon: CalendarDays },
-  { to: '/admin/listings', label: 'Listing drafts', icon: FileText },
-  { to: '/admin/settings/integrations', label: 'Integrations', icon: Settings },
+  { to: '/admin/product-radar/events', label: 'Events calendar', icon: CalendarDays },
+  { to: '/admin/listings', label: 'Listings', icon: FileText },
+  { to: '/admin/settings/integrations', label: 'Settings', icon: Settings },
 ];
 
 let csrfToken = '';
@@ -216,6 +220,7 @@ function AdminShell({ session }) {
         </div>
         <main id="admin-content" className="admin-content">
           <Routes>
+            <Route path="overview" element={<Overview />} />
             <Route path="product-radar" element={<RadarDashboard />} />
             <Route path="product-radar/events" element={<EventsPage />} />
             <Route path="listings" element={<ListingsPage />} />
@@ -244,10 +249,94 @@ function useDashboard() {
   return { ...state, reload: load };
 }
 
+function Overview() {
+  const { loading, data, error, reload } = useDashboard();
+  if (loading) return <PageSkeleton />;
+  if (error) return <ErrorState message={error} retry={reload} />;
+  const products = data.products ?? [];
+  const ready = products.filter((p) => p.review === 'approved' && p.verified === 'verified').length;
+  return (
+    <>
+      <PageHeader
+        eyebrow="Operations workspace"
+        title="Overview"
+        copy="Your weekly snapshot of opportunities, event timing, and listing readiness."
+      />
+      <section className="metric-grid" aria-label="Operations summary">
+        <Metric
+          icon={Activity}
+          label="Active events"
+          value={data.events.filter((e) => e.status === 'active').length}
+          note="Selling windows open"
+        />
+        <Metric
+          icon={Clock3}
+          label="Coming next"
+          value={data.events.filter((e) => e.status === 'coming_soon').length}
+          note="Prepare production"
+        />
+        <Metric icon={PackageCheck} label="Ready to draft" value={ready} note="Rights verified" />
+        <Metric icon={FileText} label="Listing drafts" value={data.listings.length} note="In your workspace" />
+      </section>
+      <div className="overview-grid">
+        <Section title="Next best actions" subtitle="Move the weekly workflow forward">
+          <div className="quick-actions">
+            <NavLink to="/admin/product-radar">
+              <LayoutDashboard />
+              <span>
+                <strong>Review Product Radar</strong>
+                <small>Compare and approve current opportunities.</small>
+              </span>
+              <ChevronRight />
+            </NavLink>
+            <NavLink to="/admin/product-radar/events">
+              <CalendarDays />
+              <span>
+                <strong>Check event timing</strong>
+                <small>Prioritize launches by urgency and lead time.</small>
+              </span>
+              <ChevronRight />
+            </NavLink>
+            <NavLink to="/admin/listings">
+              <FileText />
+              <span>
+                <strong>Finish listing drafts</strong>
+                <small>Review copy, media, rights, and publishing gates.</small>
+              </span>
+              <ChevronRight />
+            </NavLink>
+          </div>
+        </Section>
+        <Section
+          title="Radar status"
+          subtitle={
+            data.lastSuccessfulRun
+              ? `Last successful run ${formatDate(data.lastSuccessfulRun.date)}`
+              : 'No successful runs yet'
+          }
+        >
+          <div className="overview-status">
+            <Status value={data.lastSuccessfulRun?.status ?? 'pending'} />
+            <p>
+              {data.fixtureMode
+                ? 'Sample mode is active. Live research and external writes remain disabled.'
+                : 'Radar is connected to live research sources.'}
+            </p>
+            <NavLink className="admin-link" to="/admin/settings/integrations">
+              Review integration settings <ChevronRight size={16} />
+            </NavLink>
+          </div>
+        </Section>
+      </div>
+    </>
+  );
+}
+
 function RadarDashboard() {
   const { loading, data, error, reload } = useDashboard();
   const [params, setParams] = useSearchParams();
   const [runState, setRunState] = useState(null);
+  const [view, setView] = useState('grid');
   if (loading) return <PageSkeleton />;
   if (error) return <ErrorState message={error} retry={reload} />;
   const products = data.products ?? [];
@@ -284,6 +373,12 @@ function RadarDashboard() {
   const set = (key, value) => {
     const next = new URLSearchParams(params);
     value === 'all' || !value ? next.delete(key) : next.set(key, value);
+    setParams(next);
+  };
+  const activeFilters = [...params.entries()].filter(([key]) => key !== 'sort');
+  const clearFilters = () => {
+    const next = new URLSearchParams();
+    if (sort !== 'score') next.set('sort', sort);
     setParams(next);
   };
   async function runRadar() {
@@ -454,8 +549,41 @@ function RadarDashboard() {
               ['title', 'Title'],
             ]}
           />
+          <div className="view-toggle" aria-label="Opportunity view">
+            <button
+              className={view === 'grid' ? 'active' : ''}
+              onClick={() => setView('grid')}
+              aria-label="Card view"
+              aria-pressed={view === 'grid'}
+            >
+              <Grid3X3 size={16} />
+            </button>
+            <button
+              className={view === 'list' ? 'active' : ''}
+              onClick={() => setView('list')}
+              aria-label="Compact view"
+              aria-pressed={view === 'list'}
+            >
+              <List size={17} />
+            </button>
+          </div>
         </div>
-        <div className="product-grid">
+        {activeFilters.length > 0 && (
+          <div className="active-filters" aria-label="Active filters">
+            {activeFilters.map(([key, value]) => (
+              <button key={key} onClick={() => set(key, key === 'q' ? '' : 'all')}>
+                <span>
+                  {key}: {value.replaceAll('_', ' ')}
+                </span>
+                <X size={14} />
+              </button>
+            ))}
+            <button className="clear-filters" onClick={clearFilters}>
+              Clear all
+            </button>
+          </div>
+        )}
+        <div className={`product-grid ${view === 'list' ? 'compact' : ''}`}>
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -676,6 +804,7 @@ function EventsPage() {
               <div className="event-title">
                 <h2>{e.name}</h2>
                 <Status value={e.status} />
+                <span className={`urgency urgency-${eventUrgency(e)}`}>{eventCountdown(e)}</span>
                 {e.sample && <span className="sample-badge">Sample data</span>}
               </div>
               <p>{e.summary}</p>
@@ -750,19 +879,30 @@ function ListingsPage() {
           ]}
         />
       </div>
-      <div className="listing-list">
+      <div className="listing-list" role="table" aria-label="Listing drafts">
+        <div className="listing-head" role="row">
+          <span role="columnheader">Listing</span>
+          <span role="columnheader">Status</span>
+          <span role="columnheader">Price</span>
+          <span role="columnheader">Quantity</span>
+          <span role="columnheader">Updated</span>
+          <span aria-hidden="true" />
+        </div>
         {listings.map((l) => (
-          <NavLink key={l.id} to={`/admin/listings/${l.id}`}>
+          <NavLink key={l.id} to={`/admin/listings/${l.id}`} role="row">
             <div className="listing-icon">
               <FileText />
             </div>
-            <div>
-              <Status value={l.status} />
+            <div className="listing-name" role="cell">
               <h2>{l.title}</h2>
-              <p className="mono">
-                {l.sku} · ${Number(l.price).toFixed(2)} · Qty {l.quantity}
-              </p>
+              <p className="mono">{l.sku}</p>
             </div>
+            <div role="cell">
+              <Status value={l.status} />
+            </div>
+            <strong role="cell">${Number(l.price).toFixed(2)}</strong>
+            <span role="cell">{l.quantity}</span>
+            <span role="cell">{formatDate(l.updatedAt ?? l.createdAt)}</span>
             <ChevronRight />
           </NavLink>
         ))}
@@ -785,6 +925,7 @@ function ListingEditor({ config }) {
   const [confirm, setConfirm] = useState(false);
   const [uploading, setUploading] = useState(false);
   const dialogRef = useRef(null);
+  const confirmTriggerRef = useRef(null);
   useEffect(() => {
     if (dashboard.data) {
       const fixture = dashboard.data.listings.find((l) => l.id === id);
@@ -805,7 +946,32 @@ function ListingEditor({ config }) {
     }
   }, [dashboard.data, id]);
   useEffect(() => {
-    if (confirm) dialogRef.current?.querySelector('button')?.focus();
+    if (!confirm) return undefined;
+    const focusable = [...(dialogRef.current?.querySelectorAll('button, [href], input, select, textarea') ?? [])];
+    const trigger = confirmTriggerRef.current;
+    focusable[0]?.focus();
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setConfirm(false);
+        trigger?.focus();
+        return;
+      }
+      if (event.key !== 'Tab' || !focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      trigger?.focus();
+    };
   }, [confirm]);
   if (dashboard.loading || !listing) return <PageSkeleton />;
   const set = (key, value) => setListing({ ...listing, [key]: value });
@@ -892,6 +1058,7 @@ function ListingEditor({ config }) {
               <Copy size={17} /> Duplicate
             </button>
             <button
+              ref={confirmTriggerRef}
               className="admin-button primary"
               onClick={() => setConfirm(true)}
               disabled={!config.etsyDraftsEnabled || !eligible}
@@ -1106,7 +1273,6 @@ function ListingEditor({ config }) {
             aria-modal="true"
             aria-labelledby="confirm-title"
             ref={dialogRef}
-            onKeyDown={(e) => e.key === 'Escape' && setConfirm(false)}
           >
             <div className="dialog-icon">
               <Store />
@@ -1402,4 +1568,26 @@ function formatDate(value) {
     day: 'numeric',
     year: 'numeric',
   });
+}
+
+function eventCountdown(event) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(`${event.startDate}T00:00:00`);
+  const end = new Date(`${event.endDate}T23:59:59`);
+  const daysToStart = Math.ceil((start - today) / 86400000);
+  const daysToEnd = Math.ceil((end - today) / 86400000);
+  if (daysToEnd < 0) return 'Ended';
+  if (daysToStart <= 0) return `${Math.max(daysToEnd, 0)} days left`;
+  return `Starts in ${daysToStart} days`;
+}
+
+function eventUrgency(event) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const start = new Date(`${event.startDate}T00:00:00`);
+  const days = Math.ceil((start - today) / 86400000);
+  if (event.status === 'active' || days <= 14) return 'high';
+  if (days <= 45) return 'medium';
+  return 'low';
 }
