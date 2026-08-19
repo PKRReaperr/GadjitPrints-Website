@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Navigate,
   NavLink,
@@ -19,6 +19,7 @@ import {
   Copy,
   Clock3,
   FileText,
+  ExternalLink,
   ImagePlus,
   LayoutDashboard,
   ListFilter,
@@ -166,7 +167,6 @@ function AdminGate() {
 function AdminShell({ session }) {
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
   async function signOut() {
     await api('/api/admin/logout', { method: 'POST' });
     navigate('/admin/login', { replace: true });
@@ -204,15 +204,11 @@ function AdminShell({ session }) {
       </aside>
       {menu && <button className="sidebar-scrim" aria-label="Close menu" onClick={() => setMenu(false)} />}
       <div className="admin-stage">
-        <header className="admin-topbar">
+        <header className="admin-mobilebar">
           <button className="icon-button menu-button" onClick={() => setMenu(true)} aria-label="Open navigation">
             <Menu />
           </button>
-          <Breadcrumbs path={location.pathname} />
-          <div className="admin-identity">
-            <span>{session.username}</span>
-            <strong>Administrator</strong>
-          </div>
+          <strong>Gadjit Prints Admin</strong>
         </header>
         <div className="draft-only-banner">
           <ShieldCheck size={17} /> Beta creates Etsy drafts only. Final review and publishing must be completed in
@@ -236,21 +232,6 @@ function AdminShell({ session }) {
   );
 }
 
-function Breadcrumbs({ path }) {
-  const segments = path.split('/').filter(Boolean).slice(1);
-  return (
-    <nav className="breadcrumbs" aria-label="Breadcrumb">
-      <NavLink to="/admin/product-radar">Admin</NavLink>
-      {segments.map((segment, index) => (
-        <React.Fragment key={`${segment}-${index}`}>
-          <ChevronRight size={14} />
-          <span>{segment.replaceAll('-', ' ')}</span>
-        </React.Fragment>
-      ))}
-    </nav>
-  );
-}
-
 function useDashboard() {
   const [state, setState] = useState({ loading: true, data: null, error: '' });
   const load = () => {
@@ -266,7 +247,7 @@ function useDashboard() {
 function RadarDashboard() {
   const { loading, data, error, reload } = useDashboard();
   const [params, setParams] = useSearchParams();
-  const [runState, setRunState] = useState('');
+  const [runState, setRunState] = useState(null);
   if (loading) return <PageSkeleton />;
   if (error) return <ErrorState message={error} retry={reload} />;
   const products = data.products ?? [];
@@ -306,18 +287,25 @@ function RadarDashboard() {
     setParams(next);
   };
   async function runRadar() {
-    if (runState === 'running') return;
-    setRunState('running');
+    if (runState?.kind === 'running') return;
+    setRunState({ kind: 'running', message: data.fixtureMode ? 'Starting a safe sample run…' : 'Starting Radar…' });
     try {
       const result = await api('/api/admin/radar/run', { method: 'POST' });
-      setRunState(result.duplicate ? 'Already running for this hour.' : 'Radar queued safely.');
+      setRunState({
+        kind: 'success',
+        message: result.duplicate
+          ? 'This hour’s Radar run already exists; no duplicate was created.'
+          : data.fixtureMode
+            ? 'Sample run completed. No live sources were searched because fixture mode is enabled.'
+            : 'Radar started. New recommendations will appear after the research run completes.',
+      });
       reload();
     } catch (e) {
-      setRunState(e.message);
+      setRunState({ kind: 'error', message: e.message });
     }
   }
   const shortlist = [...products]
-    .filter((p) => p.review === 'approved' && p.verified === 'verified')
+    .filter((p) => p.review === 'approved' && p.verified === 'verified' && /^https?:\/\//.test(p.source ?? ''))
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
   return (
@@ -327,14 +315,22 @@ function RadarDashboard() {
         title="Product Radar"
         copy="A review-first queue of seasonal product opportunities, licenses, and Etsy readiness."
         actions={
-          <button className="admin-button primary" onClick={runRadar} disabled={runState === 'running'}>
-            <Play size={17} /> {runState === 'running' ? 'Starting…' : 'Run Radar'}
-          </button>
+          <div className="radar-run-action">
+            <button className="admin-button primary" onClick={runRadar} disabled={runState?.kind === 'running'}>
+              {runState?.kind === 'running' ? <LoaderCircle className="spin" size={17} /> : <Play size={17} />}
+              {runState?.kind === 'running' ? 'Starting…' : data.fixtureMode ? 'Run sample Radar' : 'Run Radar now'}
+            </button>
+            <small>
+              {data.fixtureMode
+                ? 'Sample mode: records a test run without searching the web.'
+                : 'Searches for current models and adds them to the review queue.'}
+            </small>
+          </div>
         }
       />
       {runState && (
-        <Notice tone={runState.includes('queued') || runState.includes('Already') ? 'success' : 'neutral'} live>
-          {runState}
+        <Notice tone={runState.kind === 'running' ? 'neutral' : runState.kind} live>
+          {runState.message}
         </Notice>
       )}
       <section className="metric-grid">
@@ -363,16 +359,14 @@ function RadarDashboard() {
           note="License or IP"
         />
       </section>
-      <Section title="Make This Week" subtitle="Top approved opportunities with verified rights">
+      <Section title="Make This Week" subtitle="Approved recommendations with verified rights and direct model links">
         <div className="shortlist">
           {shortlist.length ? (
-            shortlist.map((product, index) => (
-              <ProductCard key={product.id} product={product} rank={index + 1} featured />
-            ))
+            shortlist.map((product, index) => <MakeThisWeekItem key={product.id} product={product} rank={index + 1} />)
           ) : (
             <EmptyState
-              title="No products are cleared yet"
-              copy="Approve both the recommendation and its license after reviewing the evidence."
+              title="No linked print files are cleared yet"
+              copy="A recommendation appears here only after both its review and license are approved and it has a direct model-source link."
             />
           )}
         </div>
@@ -503,6 +497,32 @@ function RadarDashboard() {
         </Notice>
       )}
     </>
+  );
+}
+
+function MakeThisWeekItem({ product, rank }) {
+  return (
+    <a className="make-week-item" href={product.source} target="_blank" rel="noreferrer">
+      <span className="make-week-rank mono">0{rank}</span>
+      <div>
+        <div className="card-kicker">
+          <Status value={product.review} />
+          <span className="mono">{product.score}/100</span>
+        </div>
+        <h3>{product.title}</h3>
+        <p>
+          {product.hook} · {product.region}
+        </p>
+        <div className="card-meta">
+          <span>{product.complexity} complexity</span>
+          <span>{product.printTime ? `${product.printTime} min` : 'Time unknown'}</span>
+          <span>{product.license}</span>
+        </div>
+      </div>
+      <span className="make-week-link">
+        Open print file <ExternalLink size={16} />
+      </span>
+    </a>
   );
 }
 

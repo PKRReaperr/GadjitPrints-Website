@@ -81,7 +81,16 @@ function publicConfig() {
 }
 
 async function dashboardData() {
-  if (process.env.RADAR_FIXTURE_MODE === 'true') return fixtureDashboard();
+  if (process.env.RADAR_FIXTURE_MODE === 'true') {
+    const fixture = fixtureDashboard();
+    const storedRuns = await getDb().select().from(radarRuns).orderBy(desc(radarRuns.createdAt)).limit(12);
+    const runs = storedRuns.length ? storedRuns.map((run) => ({ ...run, date: run.createdAt })) : fixture.runs;
+    return {
+      ...fixture,
+      runs,
+      lastSuccessfulRun: runs.find((run) => run.status === 'completed') ?? null,
+    };
+  }
   const db = getDb();
   const [events, rawProducts, runs, listings] = await Promise.all([
     db.select().from(eventOpportunities).orderBy(eventOpportunities.startDate),
