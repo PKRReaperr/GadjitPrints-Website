@@ -265,7 +265,7 @@ function FeaturedPiece() {
     <section className="featured" aria-label="Featured piece">
       <NavLink className="featured-link" to={`/collection/${product.slug}`}>
         <span className="featured-mat">
-          <img src={imageUrl} alt={product.title} decoding="async" fetchpriority="high" />
+          <img src={imageUrl} alt={product.title} decoding="async" fetchPriority="high" />
         </span>
         <span className="featured-caption">
           <span className="featured-name">{displayName(product.title)}</span>
