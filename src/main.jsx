@@ -644,7 +644,7 @@ function ProductDetailContent({ product }) {
                   aria-label={`View photo ${index + 1} of ${imageCount}`}
                   aria-pressed={selectedImageIndex === index}
                 >
-                  <img src={imageUrl} alt="" loading="lazy" decoding="async" />
+                  <img src={imageUrl} alt="" decoding="async" />
                 </button>
               ))}
             </div>
