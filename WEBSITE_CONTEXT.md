@@ -10,7 +10,7 @@ Gadjit Prints is a small custom 3D printing studio. The website is where custome
 - The owner publishes and edits listings and their options in Etsy Shop Manager.
 - Payments, shipping, inventory, and orders stay on Etsy and are out of scope for the website.
 
-The Houston-area and Gadjit connection should only appear as a small note on the Studio page. Gadjit Prints has a quiet connection to Gadjit, a camera business with more than 10 years of experience around used and open-box camera gear, but that is not the main site positioning. The primary message is made-to-order 3D printed pieces.
+The Gadjit connection appears only as a one-line note on the Studio page ("Gadjit Prints is a sister studio to Gadjit"). Gadjit is a camera business, but that is not this site's positioning. The primary message is made-to-order 3D printed pieces. Do not add location branding ("Made in Texas", "Ships from Texas", Houston) or filler badges such as "Made to order" chips on every product.
 
 The website is a **sister site to Gadjit.net** (https://www.gadjit.net/). It shares Gadjit.net's typography, colors, spacing, alignment, and component styling, while keeping its own Gadjit Prints logo, finished-print photography, and made-to-order studio identity. It should feel clear, flat, and well aligned, never like a generic ecommerce template or a technical 3D printer showcase. (Until November 2026 the site used a dark "cinematic" look with amber gradients and glass panels; that direction is retired.)
 
@@ -31,7 +31,9 @@ The visual system (implemented in `src/styles.css`, modelled on the Gadjit.net r
 - **Color (light, primary):** white `#FFFFFF`, charcoal `#262322`, Gadjit orange `#F15A24`. Orange is for active underlines, markers, focus rings, and selective accents. Small orange text uses the darker `--accent-text` (`#AD3B0D`) for contrast. Secondary surfaces are the reference's muted neutrals `#E8E2DE` and `#D8D9D4`.
 - **Dark mode:** same type, grid, and orange on charcoal surfaces (`#1A1817` page, `#262322` surfaces) with light text `#F4F1EE`. Photo mats stay light so product photos read the same in both themes. The Light / Dark / System control and saved preference (`public/theme.js`) are unchanged.
 - **Grid:** one shared content grid, `.container`: a 1440 px content cap with 16–32 px gutters (`--gutter`). Header, headings, tiles, bands, and footer align to the same edges. Section spacing is `--section-gap` (about 36 px on mobile up to 72 px on desktop); card gaps (`--card-gap`, 16–24 px) stay tighter than section gaps.
-- **Components:** a flat sticky header with the logo and wordmark on the left, centered uppercase navigation with an orange active underline, and a thin bottom rule; below 900 px a compact drop-down menu. Square or 2 px-radius buttons (charcoal primary, outline secondary, light on charcoal bands), thin rules, ruled lists with square orange markers, and a charcoal band for contrast. Hover states are restrained (color swaps, border darkening). No gradients, glows, glass panels, shadows, pills, or reveal animations.
+- **Logo:** like Gadjit.net, the header shows only the mark (`public/brand/gadjitprints-mark.webp`, 50 px): black on a transparent background, with no box, border, or wordmark. Dark mode inverts it to white with `filter: invert(1)`. The footer uses the same mark. `public/favicon.svg` (flips to white in dark browser chrome) and `favicon-96x96.png` come from the same mark. `gadjitprints-logo.png` (white on black) is the original source; the transparent mark was made from it by mapping brightness to transparency.
+- **Text:** keep copy short. No eyebrow labels that repeat a heading, no repeated ordering notes, no location or "made to order" badges.
+- **Components:** a flat sticky header with the mark on the left, centered uppercase navigation with an orange active underline, and a thin bottom rule; below 900 px a compact drop-down menu. Square or 2 px-radius buttons (charcoal primary, outline secondary, light on charcoal bands), thin rules, ruled lists with square orange markers, and a charcoal band for contrast. Hover states are restrained (color swaps, border darkening). No gradients, glows, glass panels, shadows, pills, or reveal animations.
 - **Photos:** product photos sit in `.photo-frame` tiles (4:5, `object-fit: contain`, light mat, thin border) so tall and square photos are never awkwardly cropped. Only decorative studio photos (`.split-media`, `.photo-row`) use `cover`.
 
 Avoid:
@@ -53,7 +55,7 @@ Avoid:
    - "Customize on Etsy" is used when the listing has personalization (optional or required) or variations.
    - "View on Etsy" is used otherwise.
 4. On Etsy the customer chooses options, enters personalization or uploads, checks out, and pays.
-5. The piece is printed after the order arrives, checked, and shipped from Texas. Etsy sends tracking and order updates.
+5. The piece is printed after the order arrives, checked, and shipped. Etsy sends tracking and order updates.
 
 The site never shows a price. Product pages say "Price on Etsy" and link to the listing, so a stale price can never appear. The Etsy link keeps the referrer (`rel="noopener"`, not `noreferrer`) so Etsy shop stats credit the website as a traffic source.
 
@@ -85,7 +87,7 @@ How the sync works, its safeguards, and how to add copy for new listings: see `d
   category: 'Decor & Collectibles',     // listingCopy, else 'New on Etsy'; drives the Category filter
   imageUrls: ['https://i.etsystatic.com/...'], // from the sync, 794 px wide, in Etsy photo order
   copy: 'Short description written for the website.', // listingCopy, else the Etsy summary
-  includes: ['Printed in PLA', 'Made to order'], // listingCopy only; optional chips
+  includes: ['Printed in PLA'],          // listingCopy only; optional material/fit details
   etsy: {
     listingId: '4523619401',            // stable Etsy listing ID; the link is built from it
     personalization: 'none',            // from the sync: 'none' | 'optional' | 'required'
@@ -115,11 +117,11 @@ Helpers in the same file (shared by the UI and the checks): `buildProducts`, `ge
 
 The app is a client-rendered Vite + React SPA using React Router.
 
-- `/` Homepage: asymmetric split hero (headline, one sentence, "Browse products" CTA, and the first photo of up to two listings in their own grid area), "Available now" product grid with a section-level ordering note, a charcoal "How ordering works" band with numbered steps, and a studio introduction.
+- `/` Homepage: asymmetric split hero (headline, one sentence, "Browse products" CTA, and the first photo of up to two listings in their own grid area), "Ready to order" product grid, a charcoal "How ordering works" band with numbered steps, and a studio introduction.
 - `/collection` Left-aligned page intro, compact category filter chips with counts, a shared ordering note, and a photo-led product grid (`auto-fill`, 320 px minimum columns) that works for two listings or many. Each card has its category, name, descriptor (`type`, else a two-line summary), an options note only when the listing has personalization or options, the Etsy button, and a Details link. If the catalog is empty it shows "New pieces are on the way" with a link to the Etsy shop.
 - `/collection/:slug` Product page: two columns from 900 px (gallery with thumbnails and previous/next controls; a sticky information column with the name, descriptor, Etsy CTA, "Price on Etsy" line, description, and ruled detail lists). On mobile the gallery frame is capped at 60% of the viewport height so the name and Etsy button stay near the top. The personalization/options note appears only when the listing data calls for it. Unknown or retired slugs redirect to `/collection`.
 - `/collection/:slug/configure` Legacy configurator URL; redirects to `/collection/:slug`.
-- `/process` How it works: page heading, ruled numbered steps (browse, order on Etsy, printed to order, shipped from Texas), "Before you order" notes, and a closing CTA band.
+- `/process` How it works: page heading, ruled numbered steps (browse, order on Etsy, printed to order, shipped to you), "Before you order" notes, and a closing CTA band.
 - `/studio` About the studio, adapted from Gadjit.net's About page: a large left-aligned heading between rules with a short lead and numbered facts, finished-product photos, a short story, a brief supporting note about the Gadjit connection, and a CTA band.
 - `/quote` Redirects to `/collection`.
 - `*` Redirects to `/collection`.
@@ -133,7 +135,7 @@ The app is a client-rendered Vite + React SPA using React Router.
 - `.github/workflows/etsy-sync.yml`: runs the sync every 3 hours on `main`.
 - `src/styles.css`: global CSS, design tokens, light theme overrides, responsive layout.
 - `public/theme.js`: runs before paint to apply the system/light/dark preference.
-- `public/brand/gadjitprints-logo.webp`: logo used in the UI; `gadjitprints-logo.png` is the source asset.
+- `public/brand/gadjitprints-mark.webp` (and `.png`): the transparent mark used in the header and footer. `public/favicon.svg`, `public/favicon-96x96.png`: favicons. `public/brand/gadjitprints-logo.png` / `.webp`: the original white-on-black logo, kept as the source asset and no longer shown.
 - `index.html`: Vite entry HTML.
 - `scripts/catalog-check.mjs`, `scripts/theme-check.mjs`: Node checks.
 
@@ -190,7 +192,7 @@ npm run sync:etsy:dry  # live Etsy check; asks for the key, writes nothing
 - Do not add heart/share buttons or 3D printer machine imagery.
 - Follow the Gadjit.net sister-site system above (Akshar and Mulish, white / charcoal / orange, flat surfaces, thin rules, shared grid). Treat light as the primary reference and keep dark mode and the Light / Dark / System control working.
 - Check changes at 390, 768, 1280, and 1440 px in both themes, with no horizontal overflow.
-- Keep Houston and Gadjit references limited to the Studio page.
+- Keep the Gadjit reference to the one-line Studio note. No location branding (Texas, Houston).
 - Preserve the Vercel SPA rewrite.
 - Keep the Etsy footer notice and the 3-hour sync schedule. Never commit the Etsy key.
 - Run `npm run build`, `npm run test:catalog`, `npm run test:theme`, and `npm run test:sync`, then check the pages in a browser.

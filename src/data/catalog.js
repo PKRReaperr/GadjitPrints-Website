@@ -26,7 +26,7 @@ export const listingCopy = {
     type: 'Championship display trophy',
     category: 'Decor & Collectibles',
     copy: 'A lightweight championship-style trophy for watch parties, team awards, fantasy leagues, and soccer-themed shelves. Printed to order, with small layer lines that make each piece its own. A fan-made decorative piece, not affiliated with any official soccer organization.',
-    includes: ['Printed in PLA', 'Made to order', 'Ships from Texas'],
+    includes: ['Printed in PLA'],
   },
   // https://www.etsy.com/listing/4594768652
   '4594768652': {
@@ -34,7 +34,7 @@ export const listingCopy = {
     type: 'HB-71 compatible replacement hood',
     category: 'Camera Gear',
     copy: 'A twist-on replacement hood for the Nikon AF-S NIKKOR 200–500mm f/5.6E ED VR. It shades the front of the lens and adds a buffer against bumps. A compatible 3D-printed replacement, not an original Nikon accessory, so please check your lens model before ordering.',
-    includes: ['Printed in PETG', 'Twist-on fit', 'Made to order', 'Ships from Texas'],
+    includes: ['Printed in PETG', 'Twist-on fit'],
   },
 };
 

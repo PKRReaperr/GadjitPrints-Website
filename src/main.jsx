@@ -20,7 +20,8 @@ const navItems = [
   { to: '/studio', label: 'Studio' },
 ];
 
-const brandLogo = '/brand/gadjitprints-logo.webp';
+// Black mark on a transparent background, like the Gadjit.net logo; CSS inverts it in dark mode.
+const brandLogo = '/brand/gadjitprints-mark.webp';
 
 const processSteps = [
   {
@@ -40,7 +41,7 @@ const processSteps = [
   },
   {
     step: '04',
-    title: 'Shipped from Texas',
+    title: 'Shipped to you',
     text: 'Etsy sends tracking and order updates, and you can message the shop through Etsy with any questions.',
   },
 ];
@@ -141,8 +142,7 @@ function SiteShell({ children }) {
       <header className={`site-header${open ? ' is-open' : ''}`}>
         <div className="container header-inner">
           <NavLink className="brand" to="/" onClick={() => setOpen(false)}>
-            <img src={brandLogo} alt="" width="40" height="40" decoding="async" />
-            <span>Gadjit Prints</span>
+            <img src={brandLogo} alt="Gadjit Prints" width="50" height="50" decoding="async" />
           </NavLink>
           <nav className="nav" id="site-navigation" aria-label="Primary navigation">
             {navItems.map((item) => (
@@ -224,13 +224,10 @@ function Hero() {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
-        <p className="label label-accent">Made-to-order 3D prints</p>
         <h1 id="hero-title" className="display">
           Finished prints, made one order at a time.
         </h1>
-        <p className="lead">
-          Practical, giftable, and display-ready pieces, printed in a small Texas studio after you order on Etsy.
-        </p>
+        <p className="lead">Practical, giftable, and display-ready pieces, printed after you order on Etsy.</p>
         <div className="actions">
           <NavLink className="button button-primary" to="/collection">
             Browse products <ArrowRight size={18} aria-hidden="true" />
@@ -261,19 +258,13 @@ function AvailableNow() {
   return (
     <section className="section" aria-labelledby="available-title">
       <div className="section-heading section-heading-split">
-        <div>
-          <p className="label label-accent">Available now</p>
-          <h2 id="available-title">Ready to order</h2>
-        </div>
+        <h2 id="available-title">Ready to order</h2>
         <NavLink className="text-link" to="/collection">
           View all products <ArrowRight size={16} aria-hidden="true" />
         </NavLink>
       </div>
       {products.length ? (
-        <>
-          <OrderingNote />
-          <ProductGrid items={products.slice(0, 4)} />
-        </>
+        <ProductGrid items={products.slice(0, 4)} />
       ) : (
         <EmptyCatalog />
       )}
@@ -285,7 +276,6 @@ function MadeToOrderBand() {
   return (
     <section className="section band" aria-labelledby="made-title">
       <div className="band-heading">
-        <p className="label label-accent">How ordering works</p>
         <h2 id="made-title">Browse here. Order on Etsy. Printed for you.</h2>
         <NavLink className="button button-light" to="/process">
           See how it works <ArrowRight size={18} aria-hidden="true" />
@@ -317,7 +307,6 @@ function StudioIntro() {
         </div>
       ) : null}
       <div className="split-copy">
-        <p className="label label-accent">The studio</p>
         <h2 id="studio-intro-title">A small studio for useful, personal pieces.</h2>
         <p>
           Gadjit Prints designs and prints practical and display-worthy pieces to order. Each one is printed on its
@@ -343,9 +332,8 @@ function Collection() {
   return (
     <div className="container page">
       <PageIntro
-        label="Products"
         title={'Made-⁠to-⁠order 3D prints'}
-        copy="Every piece below is an active listing in the Gadjit Prints Etsy shop. Open a product for photos and details, then choose options and check out on Etsy."
+        copy="Every piece here is an active listing in the Gadjit Prints Etsy shop."
       />
       {products.length ? (
         <section className="catalog" aria-label="Products">
@@ -392,7 +380,6 @@ function Process() {
   return (
     <div className="container page">
       <PageIntro
-        label="How it works"
         title="Browse here. Order on Etsy. Printed for you."
         copy="Gadjit Prints shows each piece here with real photos. Ordering, options, personalization, payment, and shipping all happen on Etsy."
       />
@@ -409,7 +396,6 @@ function Process() {
       </section>
       <section className="section" aria-labelledby="good-to-know-title">
         <div className="section-heading">
-          <p className="label label-accent">Good to know</p>
           <h2 id="good-to-know-title">Before you order</h2>
         </div>
         <div className="notes">
@@ -439,7 +425,6 @@ function Studio() {
     <div className="container page">
       <section className="about-intro" aria-labelledby="studio-title">
         <div className="about-intro-copy">
-          <p className="label label-accent">About the studio</p>
           <h1 id="studio-title" className="display display-xl">
             Small studio. Careful prints.
           </h1>
@@ -482,15 +467,15 @@ function Studio() {
             that makes a made-to-order piece worthwhile.
           </p>
           <p>
-            Every piece is printed after it is ordered, then cleaned up and checked before it ships from Texas. That
-            can take a little longer than a mass-production shop, but each piece gets real attention.
+            Every piece is printed after it is ordered, then cleaned up and checked before it ships. That can take a
+            little longer than a mass-production shop, but each piece gets real attention.
           </p>
           <p className="supporting-note">
             Gadjit Prints is a sister studio to{' '}
             <a href="https://gadjit.net" target="_blank" rel="noreferrer">
               Gadjit
             </a>
-            , based in the Houston area.
+            .
           </p>
         </div>
       </section>
@@ -499,10 +484,9 @@ function Studio() {
   );
 }
 
-function PageIntro({ label, title, copy }) {
+function PageIntro({ title, copy }) {
   return (
     <section className="page-intro">
-      <p className="label label-accent">{label}</p>
       <h1 className="display">{title}</h1>
       <p className="lead">{copy}</p>
     </section>
@@ -575,7 +559,6 @@ function ProductCard({ product }) {
         </span>
       </NavLink>
       <div className="product-card-body">
-        <p className="label">{product.category}</p>
         <h3 className="product-card-title">
           <NavLink to={detailUrl}>{displayName(product.title)}</NavLink>
         </h3>
@@ -678,7 +661,6 @@ function ProductDetailContent({ product }) {
           ) : null}
         </section>
         <section className="product-info" aria-labelledby="product-title">
-          <p className="label label-accent">{product.category}</p>
           <h1 id="product-title" className="product-title">
             {displayName(product.title)}
           </h1>
@@ -688,7 +670,7 @@ function ProductDetailContent({ product }) {
               <p className="product-options-note">{getEtsyOptionsNote(product)}</p>
             ) : null}
             <EtsyLink product={product} className="button button-primary button-block" />
-            <p className="fine-print">Price on Etsy. Made to order and shipped from Texas.</p>
+            <p className="fine-print">Price and checkout on Etsy.</p>
           </div>
           <div className="product-description">
             <p>{product.copy}</p>
@@ -700,10 +682,6 @@ function ProductDetailContent({ product }) {
               ))}
             </ul>
           ) : null}
-          <ul className="detail-list detail-list-muted" aria-label="Ordering">
-            <li>Printed after you check out on Etsy</li>
-            <li>Payment, shipping, and order updates through Etsy</li>
-          </ul>
         </section>
       </div>
     </div>
@@ -772,25 +750,17 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="container footer-inner">
-        <div className="footer-brand">
-          <img src={brandLogo} alt="" width="40" height="40" loading="lazy" decoding="async" />
-          <div>
-            <strong>Gadjit Prints</strong>
-            <p>Custom 3D printed pieces, made to order and sold on Etsy.</p>
-          </div>
-        </div>
+        <NavLink className="footer-brand" to="/">
+          <img src={brandLogo} alt="Gadjit Prints" width="50" height="50" loading="lazy" decoding="async" />
+        </NavLink>
         <nav className="footer-nav" aria-label="Footer">
-          <p className="label">Explore</p>
           {navItems.slice(1).map((item) => (
             <NavLink key={item.to} to={item.to}>
               {item.label}
             </NavLink>
           ))}
-        </nav>
-        <div className="footer-shop">
-          <p className="label">Order</p>
           <ShopLink className="footer-shop-link" />
-        </div>
+        </nav>
         <p className="footer-notice">
           The term 'Etsy' is a trademark of Etsy, Inc. This Application uses Etsy's API, but is not endorsed or
           certified by Etsy.

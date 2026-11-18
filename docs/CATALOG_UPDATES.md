@@ -67,7 +67,7 @@ the Etsy description, and the "New on Etsy" category. To give it website copy:
      type: 'One-line descriptor',        // optional
      category: 'Camera Gear',            // reuse an existing category when it fits
      copy: 'Two or three calm sentences written for the website.',
-     includes: ['Printed in PETG', 'Made to order', 'Ships from Texas'],
+     includes: ['Printed in PETG', 'Twist-on fit'], // material and fit; skip location or "made to order"
    },
    ```
 
