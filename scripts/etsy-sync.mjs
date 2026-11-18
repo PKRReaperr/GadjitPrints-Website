@@ -29,8 +29,7 @@ function askHidden(question) {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true });
     rl.question(question, (answer) => {
       rl.close();
-      // Confirm the hidden input arrived, so the key is not pasted again at the shell prompt.
-      process.stdout.write(answer.trim() ? '\nKey received. Contacting Etsy...\n' : '\n');
+      process.stdout.write('\n');
       resolve(answer.trim());
     });
     // The question is already on screen; hide everything typed after it.
@@ -56,6 +55,8 @@ async function main() {
   if (!isWellFormedApiKey(apiKey)) {
     throw new EtsySyncError('ETSY_API_KEY is missing or not in the form keystring:shared_secret');
   }
+  // Confirm the key arrived, so it is not pasted again at the shell prompt.
+  console.log('Key received. Contacting Etsy...');
 
   const previous = (await import(`${pathToFileURL(listingsFile).href}?t=${Date.now()}`)).default;
   const { listings: etsyListings } = await fetchActiveListings({ shopName, apiKey });

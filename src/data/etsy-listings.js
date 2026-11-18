@@ -11,8 +11,8 @@ export default [
     "title": "3D Printed Lens Hood for Nikon 200–500mm f/5.6E ED VR",
     "summary": "Replace a missing or damaged lens hood with a 3D-printed PETG hood made for the Nikon AF-S NIKKOR 200–500mm f/5.6E ED VR lens. Its twist-on fit shades the front of the lens and provides an added barrier against bumps.",
     "imageUrls": [
-      "https://i.etsystatic.com/64616969/r/il/23d7d8/8672734822/il_794xN.8672734822_7q3p.jpg",
       "https://i.etsystatic.com/64616969/r/il/f4dc93/8672734810/il_794xN.8672734810_hq8t.jpg",
+      "https://i.etsystatic.com/64616969/r/il/23d7d8/8672734822/il_794xN.8672734822_7q3p.jpg",
       "https://i.etsystatic.com/64616969/r/il/10e8f8/8720567331/il_794xN.8720567331_11f0.jpg",
       "https://i.etsystatic.com/64616969/r/il/3b8a0e/8672734818/il_794xN.8672734818_9zqs.jpg"
     ],
@@ -25,10 +25,10 @@ export default [
     "title": "3D Printed Soccer Trophy Cup",
     "summary": "This lightweight display trophy is designed with a championship-inspired look and makes a great gift for soccer lovers, youth teams, watch parties, fantasy leagues, office competitions, or sports-themed room decor.",
     "imageUrls": [
-      "https://i.etsystatic.com/64616969/r/il/6cd8e6/8148566642/il_794xN.8148566642_11hv.jpg",
-      "https://i.etsystatic.com/64616969/r/il/cd34ad/8196480903/il_794xN.8196480903_9b71.jpg"
+      "https://i.etsystatic.com/64616969/r/il/cd34ad/8196480903/il_794xN.8196480903_9b71.jpg",
+      "https://i.etsystatic.com/64616969/r/il/6cd8e6/8148566642/il_794xN.8148566642_11hv.jpg"
     ],
-    "personalization": "none",
+    "personalization": "optional",
     "hasOptions": false
   }
 ];
