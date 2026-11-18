@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Navigate, NavLink, Route, BrowserRouter as Router, Routes, useLocation, useParams } from 'react-router-dom';
 import {
   ArrowRight,
+  ArrowUpRight,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -23,6 +24,18 @@ import {
   X,
 } from 'lucide-react';
 import './styles.css';
+import {
+  getColorsForMaterial,
+  getDefaultMaterial,
+  getEtsyActionLabel,
+  getEtsyListingUrl,
+  getEtsyOptionsNote,
+  getProductMaterials,
+  isEtsyProduct,
+  materialInfo,
+  productColors,
+  products,
+} from './data/catalog.js';
 
 const navItems = [
   { to: '/', label: 'Home' },
@@ -33,67 +46,6 @@ const navItems = [
 
 const studioEmail = 'hello@gadjitprints.store';
 const brandLogo = '/brand/gadjitprints-logo.webp';
-
-const materialInfo = {
-  PLA: {
-    title: 'PLA',
-    summary: 'Best for decorative pieces, gifts, display objects, and lower-cost orders.',
-    pros: 'Affordable, crisp detail, broad color range, clean matte finishes.',
-    cons: 'More brittle than PETG and not ideal for hot cars, high stress, or long sun exposure.',
-  },
-  PETG: {
-    title: 'PETG',
-    summary: 'Best for stronger functional pieces that need more flex and day-to-day toughness.',
-    pros: 'More impact resistant than PLA, better layer strength, handles moisture well.',
-    cons: 'Slightly less crisp visually and usually costs more than PLA.',
-  },
-  ABS: {
-    title: 'ABS',
-    summary: 'Best for sun, heat, outdoor exposure, and pieces that may live in warm places.',
-    pros: 'Good heat resistance, better UV/sun suitability, strong for practical use.',
-    cons: 'Fewer color options, rougher print behavior, and a higher-cost production setup.',
-  },
-};
-
-const colorLibrary = {
-  'Silk hot pink': {
-    swatch: '#ff4faf',
-    swatchStyle: 'linear-gradient(135deg, #ff9bd4, #ff4faf 48%, #b71374)',
-    materials: ['PLA'],
-  },
-  'Silk purple': {
-    swatch: '#8d50d8',
-    swatchStyle: 'linear-gradient(135deg, #c6a0ff, #8d50d8 52%, #4b238f)',
-    materials: ['PLA'],
-  },
-  Orange: { swatch: '#f47a24', materials: ['PLA'] },
-  'Glow blue': {
-    swatch: '#7ad8ff',
-    swatchStyle: 'radial-gradient(circle at 35% 30%, #e8fbff, #7ad8ff 52%, #2f83bb)',
-    materials: ['PLA'],
-    priceAdd: 5,
-    priceNote: 'Glow PLA +$5',
-  },
-  Green: { swatch: '#32a852', materials: ['PLA', 'PETG'] },
-  Blue: { swatch: '#2466e8', materials: ['PLA', 'PETG'] },
-  Red: { swatch: '#d6292f', materials: ['PLA', 'PETG'] },
-  White: { swatch: '#f5f1e8', materials: ['PLA', 'PETG', 'ABS'] },
-  Black: { swatch: '#11100e', materials: ['PLA', 'PETG', 'ABS'] },
-  'Galaxy black': {
-    swatch: '#17171c',
-    swatchStyle:
-      'radial-gradient(circle at 30% 28%, #d6d0ff 0 2px, transparent 3px), radial-gradient(circle at 66% 62%, #9bdcff 0 1px, transparent 3px), linear-gradient(135deg, #2d2d38, #111117)',
-    materials: ['PLA'],
-    priceAdd: 4,
-    priceNote: 'Galaxy PLA +$4',
-  },
-};
-
-const colorNames = Object.keys(colorLibrary);
-const productColors = colorNames.map((name) => ({
-  name,
-  ...colorLibrary[name],
-}));
 
 const qrStandTemplates = {
   Custom: {
@@ -121,165 +73,6 @@ const qrStandTemplates = {
     bottomLogoNotes: '',
   },
 };
-
-const products = [
-  {
-    slug: 'qr-business-card',
-    title: 'QR Business Card',
-    type: 'Custom contact card',
-    category: 'Business & Branding',
-    variant: 'business-card',
-    sourceUrl: 'https://makerworld.com/en/models/2584791-business-card-bc036qr?from=recommend#profileId-2851280',
-    imageUrls: [
-      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUSa79b282bc488cd%2Fdesign%2F98883af3adbe048c.png&w=828',
-      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUSa79b282bc488cd%2Fdesign%2Fbe65cd04b4540925.jpg&w=828',
-    ],
-    copy: 'A rigid printed business card with raised text, a scannable QR area, and a clean pocketable profile.',
-    colors: productColors,
-    config: ['Name and title', 'QR destination', 'Logo or small icon'],
-    price: 'From $18',
-    leadTime: '2-4 studio days',
-    dimensions: 'Standard card footprint',
-    printDimensions: {
-      width: 80,
-      height: 55,
-      depth: 3,
-      note: 'Fixed reference card size from the source model; raised QR and text details are included in the thickness estimate.',
-    },
-    finish: 'Flat two-tone detail',
-    includes: ['QR code area', 'Custom name text', 'Optional logo mark'],
-  },
-  {
-    slug: 'qr-code-business-stand',
-    title: 'QR Code Business Stand',
-    type: 'In-house QR display stand',
-    category: 'Business & Branding',
-    variant: 'qr-plate',
-    badge: 'In-house design',
-    configureType: 'qr-stand',
-    imageUrls: ['/products/qr-code-business-stand-hero.webp', '/products/qr-code-business-stand-print-bed.webp'],
-    copy: 'A custom counter stand for QR payments, social follows, menus, contact links, booths, and small business displays.',
-    colors: productColors,
-    config: ['Top text', 'QR color', 'Bottom text or logo', 'Rear ornament'],
-    price: 'From $35',
-    leadTime: '7-10 studio days',
-    dimensions: 'Countertop display scale',
-    printDimensions: {
-      width: 140,
-      height: 110,
-      depth: 75,
-      note: 'Approximate in-house countertop footprint. Final stand depth and ornament size are confirmed during studio review.',
-    },
-    finish: 'Multi-color raised QR display',
-    includes: ['In-house stand design', 'Custom text zones', 'QR code panel', 'Optional rear ornament'],
-    inHouseNote:
-      'Designed entirely in house by Gadjit Prints. The base plate, QR panel, text boxes, bottom logo area, and optional rear ornament can be tuned for each order.',
-  },
-  {
-    slug: 'initial-ornament-name',
-    title: 'Initial Ornament & Name',
-    type: 'Personal ornament',
-    category: 'Ornaments & Gifts',
-    variant: 'ornament',
-    sourceUrl:
-      'https://makerworld.com/en/models/2740326-fully-customizable-initial-ornament-and-name#profileId-3038641',
-    customizeUrl:
-      'https://makerworld.com/en/makerlab/parametricModelMaker?designId=2740326&from=model_page&modelName=nombre-v3.scad&protected=true&unikey=a926126f-79e1-4363-aeeb-382ea6aede75',
-    imageUrls: ['/products/initial-ornament-name.png'],
-    copy: 'A personalized ornament built around a large initial, custom name text, and a finished hanging loop.',
-    colors: productColors,
-    config: ['Initial letter', 'Name text', 'Loop style'],
-    price: 'From $16',
-    leadTime: '2-4 studio days',
-    dimensions: '3-5 in ornament span',
-    printDimensions: {
-      width: 100,
-      height: 100,
-      depth: 4,
-      note: 'Approximate standard ornament span. Long names, wide letters, or custom loop choices can change the final footprint.',
-    },
-    finish: 'Layered raised lettering',
-    includes: ['Large initial', 'Custom name', 'Hanging loop'],
-  },
-  {
-    slug: 'custom-door-hanger',
-    title: 'Custom Door Hanger',
-    type: 'Door sign',
-    category: 'Signs & Labels',
-    variant: 'door-hanger',
-    sourceUrl:
-      'https://makerworld.com/en/models/2737514-customizable-door-hanger-text-svg-emoji-support#profileId-3035138',
-    imageUrls: ['/products/custom-door-hanger.png'],
-    copy: 'A customizable door hanger with text, SVG, or emoji-style artwork support for rooms, studios, and events.',
-    colors: productColors,
-    config: ['Front text', 'Icon or SVG', 'Single or two-tone'],
-    price: 'From $22',
-    leadTime: '3-5 studio days',
-    dimensions: 'Standard door-hanger scale',
-    printDimensions: {
-      width: 89,
-      height: 216,
-      depth: 4,
-      note: 'Standard door-hanger footprint with a knob cutout. Custom graphics may change the usable text area.',
-    },
-    finish: 'Durable readable face',
-    includes: ['Custom phrase', 'Graphic option', 'Door knob cutout'],
-  },
-  {
-    slug: 'qr-luggage-bag-tag',
-    title: 'QR Luggage / Bag Tag',
-    type: 'Travel tag',
-    category: 'Travel & Gear',
-    variant: 'bag-tag',
-    sourceUrl: 'https://makerworld.com/en/models/710726-custom-qr-code-luggage-bag-tag?from=search#profileId-641133',
-    imageUrls: [
-      'https://makerworld.bblmw.com/makerworld/model/USc7eb59bdce5c4b/design/2024-10-17_4706bf9541546.jpg?x-oss-process=image%2Fresize%2Cw_1000%2Fformat%2Cwebp',
-      'https://makerworld.bblmw.com/makerworld/model/USc7eb59bdce5c4b/design/2024-10-17_6e2de6ddb58ca.jpg?x-oss-process=image%2Fresize%2Cw_1000%2Fformat%2Cwebp',
-    ],
-    copy: 'A custom travel tag with a QR code, name field, and sturdy strap slot for luggage, backpacks, and gear bags.',
-    colors: productColors,
-    config: ['QR destination', 'Name or handle', 'Tag size'],
-    price: 'From $20',
-    leadTime: '2-4 studio days',
-    dimensions: 'Medium or large tag',
-    printDimensions: {
-      width: 108,
-      height: 64,
-      depth: 3,
-      note: 'Medium luggage-tag footprint. The parametric source supports tag-size changes and recommends at least 2 mm thickness.',
-    },
-    finish: 'Raised QR and text panel',
-    includes: ['QR code panel', 'Name field', 'Strap slot'],
-  },
-  {
-    slug: 'qr-nameplate-stand',
-    title: 'QR Name Plate Stand',
-    type: 'Desk or wall nameplate',
-    category: 'Business & Branding',
-    variant: 'qr-plate',
-    sourceUrl:
-      'https://makerworld.com/en/models/2614672-customizable-qr-code-name-plate-stand-or-wall?from=search#profileId-2885404',
-    imageUrls: [
-      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2F0c7a09d0b146db1f.jpg&w=828',
-      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2F589c7773c818d9aa.jpg&w=828',
-      'https://wsrv.3dprinterfiles.com/?h=828&n=40&output=webp&q=100&url=https%3A%2F%2Fmakerworld.bblmw.com%2Fmakerworld%2Fmodel%2FUS86fd7a65b8c7f0%2Fdesign%2Ff50dbabe572c2658.jpg&w=828',
-    ],
-    copy: 'A configurable name plate with QR code support that can sit on a desk or mount to a wall.',
-    colors: productColors,
-    config: ['Display text', 'QR destination', 'Stand or wall mount'],
-    price: 'From $26',
-    leadTime: '3-5 studio days',
-    dimensions: '5-10 in width',
-    printDimensions: {
-      width: 200,
-      height: 70,
-      depth: 65,
-      note: 'Approximate desktop stand footprint. The parametric source can change width, height, thickness, stand depth, and wall-mount details.',
-    },
-    finish: 'Raised two-tone signage',
-    includes: ['QR code panel', 'Custom display name', 'Stand or wall option'],
-  },
-];
 
 const categories = [
   'Made-to-order products',
@@ -525,7 +318,7 @@ function Hero() {
       </div>
       <div className="hero-objects" aria-hidden="true">
         {heroProducts.map((product) => (
-          <ProductMedia key={product.slug} product={product} selectedColor={product.colors[0]} imageIndex={0} />
+          <ProductMedia key={product.slug} product={product} selectedColor={product.colors?.[0]} imageIndex={0} />
         ))}
       </div>
       <div className="hero-specimen float-card">
@@ -552,16 +345,23 @@ function FeaturedWork() {
       <div className="product-carousel reveal">
         <div className="carousel-stage" key={selectedProduct.slug}>
           <NavLink className="carousel-media" to={`/collection/${selectedProduct.slug}`}>
-            <ProductMedia product={selectedProduct} selectedColor={selectedProduct.colors[0]} imageIndex={0} />
+            <ProductMedia product={selectedProduct} selectedColor={selectedProduct.colors?.[0]} imageIndex={0} />
           </NavLink>
           <div className="carousel-copy">
-            <span>{selectedProduct.type}</span>
+            <span>{selectedProduct.type ?? selectedProduct.category}</span>
             <h3>{selectedProduct.title}</h3>
             <p>{selectedProduct.copy}</p>
             <div className="carousel-meta">
-              <small>{selectedProduct.price}</small>
-              <small>{selectedProduct.leadTime}</small>
-              <small>{selectedProduct.config.slice(0, 2).join(' / ')}</small>
+              {[
+                selectedProduct.price,
+                selectedProduct.leadTime,
+                (selectedProduct.config ?? []).slice(0, 2).join(' / '),
+                isEtsyProduct(selectedProduct) ? 'Ordered on Etsy' : null,
+              ]
+                .filter(Boolean)
+                .map((item) => (
+                  <small key={item}>{item}</small>
+                ))}
             </div>
             <NavLink className="text-link" to={`/collection/${selectedProduct.slug}`}>
               View product <ArrowRight size={17} />
@@ -583,7 +383,7 @@ function FeaturedWork() {
                 onClick={() => setSelectedIndex(index)}
               >
                 <span>{product.title}</span>
-                <small>{product.type}</small>
+                <small>{product.type ?? product.category}</small>
               </button>
             ))}
           </div>
@@ -664,9 +464,9 @@ function StudioCallout() {
   return (
     <section className="studio-callout">
       <div className="object-wall" aria-hidden="true">
-        <ProductVisual variant={products[3].variant} tone={products[3].colors[2].swatch} />
-        <ProductVisual variant={products[1].variant} tone={products[1].colors[0].swatch} />
-        <ProductVisual variant={products[0].variant} tone={products[0].colors[2].swatch} />
+        <ProductVisual variant={products[3].variant} tone={products[3].colors?.[2]?.swatch} />
+        <ProductVisual variant={products[1].variant} tone={products[1].colors?.[0]?.swatch} />
+        <ProductVisual variant={products[0].variant} tone={products[0].colors?.[2]?.swatch} />
       </div>
       <div className="studio-panel reveal">
         <p className="eyebrow">Small studio, careful output</p>
@@ -690,12 +490,12 @@ function Collection() {
   const categories = ['All', ...new Set(products.map((product) => product.category))];
   const materialFilters = [
     'All',
-    ...new Set(products.flatMap((product) => product.colors.flatMap((color) => color.materials))),
+    ...new Set(products.flatMap((product) => getProductMaterials(product))),
   ];
   const filteredProducts = products.filter((product) => {
     const categoryMatch = activeCategory === 'All' || product.category === activeCategory;
     const materialMatch =
-      activeMaterial === 'All' || product.colors.some((color) => color.materials.includes(activeMaterial));
+      activeMaterial === 'All' || getProductMaterials(product).includes(activeMaterial);
 
     return categoryMatch && materialMatch;
   });
@@ -830,9 +630,9 @@ function Studio() {
     >
       <section className="about-layout">
         <div className="about-image reveal" aria-hidden="true">
-          <ProductVisual variant={products[1].variant} tone={products[1].colors[0].swatch} />
-          <ProductVisual variant={products[0].variant} tone={products[0].colors[0].swatch} />
-          <ProductVisual variant={products[3].variant} tone={products[3].colors[2].swatch} />
+          <ProductVisual variant={products[1].variant} tone={products[1].colors?.[0]?.swatch} />
+          <ProductVisual variant={products[0].variant} tone={products[0].colors?.[0]?.swatch} />
+          <ProductVisual variant={products[3].variant} tone={products[3].colors?.[2]?.swatch} />
         </div>
         <div className="about-copy reveal">
           <h2>Not mass produced. Looked over, adjusted, and printed one order at a time.</h2>
@@ -898,13 +698,14 @@ function Note({ icon, title, text }) {
 }
 
 function ProductCard({ product }) {
+  const etsyProduct = isEtsyProduct(product);
   const [selectedMaterial, setSelectedMaterial] = useState(getDefaultMaterial(product));
   const materialColors = useMemo(() => getColorsForMaterial(product, selectedMaterial), [product, selectedMaterial]);
-  const [selectedColorName, setSelectedColorName] = useState(materialColors[0].name);
+  const [selectedColorName, setSelectedColorName] = useState(materialColors[0]?.name);
   const selectedColor = materialColors.find((color) => color.name === selectedColorName) ?? materialColors[0];
 
   useEffect(() => {
-    if (!materialColors.some((color) => color.name === selectedColorName)) {
+    if (materialColors.length && !materialColors.some((color) => color.name === selectedColorName)) {
       setSelectedColorName(materialColors[0].name);
     }
   }, [materialColors, selectedColorName]);
@@ -922,37 +723,49 @@ function ProductCard({ product }) {
       <div className="catalog-specs">
         <div>
           <strong>Type</strong>
-          <span>{product.type}</span>
+          <span>{product.type ?? product.category}</span>
         </div>
         <div>
-          <strong>Selected</strong>
-          <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
+          <strong>{etsyProduct ? 'Options' : 'Selected'}</strong>
+          <span>{etsyProduct ? 'Chosen on Etsy' : getConfigurationLabel(selectedColor, selectedMaterial)}</span>
         </div>
       </div>
-      <div className="catalog-options">
-        <OptionGroup title="Material">
-          <MaterialChoices
-            product={product}
-            selectedMaterial={selectedMaterial}
-            onSelectMaterial={setSelectedMaterial}
-          />
-        </OptionGroup>
-        <OptionGroup title={`${selectedMaterial} colors`}>
-          <ColorSwatches
-            colors={materialColors}
-            selectedColor={selectedColorName}
-            onSelectColor={setSelectedColorName}
-          />
-        </OptionGroup>
-      </div>
-      <div className="catalog-tags">
-        {product.config.map((item) => (
-          <span key={item}>{item}</span>
-        ))}
-      </div>
-      <NavLink className="configure-button" to={`/collection/${product.slug}/configure`}>
-        Configure
-      </NavLink>
+      {etsyProduct ? (
+        <p className={`catalog-etsy-note${product.config?.length ? '' : ' fills-row'}`}>
+          {getEtsyOptionsNote(product)}
+        </p>
+      ) : (
+        <div className="catalog-options">
+          <OptionGroup title="Material">
+            <MaterialChoices
+              product={product}
+              selectedMaterial={selectedMaterial}
+              onSelectMaterial={setSelectedMaterial}
+            />
+          </OptionGroup>
+          <OptionGroup title={`${selectedMaterial} colors`}>
+            <ColorSwatches
+              colors={materialColors}
+              selectedColor={selectedColorName}
+              onSelectColor={setSelectedColorName}
+            />
+          </OptionGroup>
+        </div>
+      )}
+      {product.config?.length ? (
+        <div className="catalog-tags">
+          {product.config.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+      ) : null}
+      {etsyProduct ? (
+        <EtsyLink className="configure-button etsy-button" product={product} />
+      ) : (
+        <NavLink className="configure-button" to={`/collection/${product.slug}/configure`}>
+          Configure
+        </NavLink>
+      )}
     </article>
   );
 }
@@ -971,13 +784,21 @@ function ProductDetail() {
 function ProductDetailContent({ product }) {
   const [selectedMaterial, setSelectedMaterial] = useState(getDefaultMaterial(product));
   const materialColors = useMemo(() => getColorsForMaterial(product, selectedMaterial), [product, selectedMaterial]);
-  const [selectedColorName, setSelectedColorName] = useState(materialColors[0].name);
+  const [selectedColorName, setSelectedColorName] = useState(materialColors[0]?.name);
   const selectedColor = materialColors.find((color) => color.name === selectedColorName) ?? materialColors[0];
   const hasProductPhotos = product.imageUrls?.length > 0;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const etsyProduct = isEtsyProduct(product);
+  const priceDisplay = getPriceDisplay(product, selectedColor);
+  const specRows = [
+    ['Price', priceDisplay],
+    ['Lead time', product.leadTime],
+    ['Dimensions', product.dimensions],
+    ['Finish', product.finish],
+  ].filter(([, value]) => Boolean(value));
 
   useEffect(() => {
-    if (!materialColors.some((color) => color.name === selectedColorName)) {
+    if (materialColors.length && !materialColors.some((color) => color.name === selectedColorName)) {
       setSelectedColorName(materialColors[0].name);
     }
   }, [materialColors, selectedColorName]);
@@ -1013,7 +834,7 @@ function ProductDetailContent({ product }) {
                 .filter(Boolean)
                 .map((color, index) => (
                   <button
-                    className={color.name === selectedColor.name ? 'is-active' : ''}
+                    className={color.name === selectedColor?.name ? 'is-active' : ''}
                     key={`${color.name}-${index}`}
                     type="button"
                     onClick={() => setSelectedColorName(color.name)}
@@ -1026,7 +847,11 @@ function ProductDetailContent({ product }) {
         <section className="detail-gallery">
           <ProductMedia product={product} selectedColor={selectedColor} imageIndex={selectedImageIndex} />
           <span>
-            {hasProductPhotos ? `Reference photo ${selectedImageIndex + 1}` : `Selected finish: ${selectedColor.name}`}
+            {hasProductPhotos
+              ? etsyProduct
+                ? `Photo ${selectedImageIndex + 1} of ${product.imageUrls.length}`
+                : `Reference photo ${selectedImageIndex + 1}`
+              : `Selected finish: ${selectedColor?.name}`}
           </span>
         </section>
         <section className="detail-main">
@@ -1039,90 +864,109 @@ function ProductDetailContent({ product }) {
               <span>{product.inHouseNote}</span>
             </div>
           ) : null}
-          <div className="detail-rating">
-            <span>Studio reviewed</span>
-            <span>
-              {[0, 1, 2, 3, 4].map((star) => (
-                <Star key={star} size={15} fill="currentColor" />
-              ))}
-            </span>
-          </div>
-          <dl className="detail-spec-table">
-            <div>
-              <dt>Price</dt>
-              <dd>{getPriceDisplay(product, selectedColor)}</dd>
-            </div>
-            <div>
-              <dt>Lead time</dt>
-              <dd>{product.leadTime}</dd>
-            </div>
-            <div>
-              <dt>Dimensions</dt>
-              <dd>{product.dimensions}</dd>
-            </div>
-            <div>
-              <dt>Finish</dt>
-              <dd>{product.finish}</dd>
-            </div>
-          </dl>
-          <div className="detail-includes">
-            {product.includes.map((item) => (
-              <span key={item}>
-                <Check size={14} />
-                {item}
+          {etsyProduct ? null : (
+            <div className="detail-rating">
+              <span>Studio reviewed</span>
+              <span>
+                {[0, 1, 2, 3, 4].map((star) => (
+                  <Star key={star} size={15} fill="currentColor" />
+                ))}
               </span>
-            ))}
-          </div>
-          {product.sourceUrl ? (
+            </div>
+          )}
+          {specRows.length ? (
+            <dl className="detail-spec-table">
+              {specRows.map(([label, value]) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+          {product.includes?.length ? (
+            <div className="detail-includes">
+              {product.includes.map((item) => (
+                <span key={item}>
+                  <Check size={14} />
+                  {item}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          {product.sourceUrl && !etsyProduct ? (
             <a className="reference-link" href={product.sourceUrl} target="_blank" rel="noreferrer">
               View reference model <ArrowRight size={16} />
             </a>
           ) : null}
         </section>
         <aside className="detail-buybox">
-          <div className="buybox-price">
-            <span>{getPriceDisplay(product, selectedColor)}</span>
-            <small>{selectedColor.priceNote ?? 'Made after selection'}</small>
-          </div>
-          <OptionGroup title="Material">
-            <MaterialChoices
-              product={product}
-              selectedMaterial={selectedMaterial}
-              onSelectMaterial={setSelectedMaterial}
-            />
-          </OptionGroup>
-          <OptionGroup title={`${selectedMaterial} colors`}>
-            <ColorSwatches
-              colors={materialColors}
-              selectedColor={selectedColorName}
-              onSelectColor={setSelectedColorName}
-            />
-          </OptionGroup>
-          <div className="buybox-selected">
-            <strong>Current configuration</strong>
-            <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
-          </div>
-          <NavLink className="button button-primary" to={`/collection/${product.slug}/configure`}>
-            Configure selection <ArrowRight size={17} />
-          </NavLink>
-          <div className="buybox-notes">
-            <span>
-              <Truck size={16} />
-              Local made-to-order production
-            </span>
-            <span>
-              <Ruler size={16} />
-              Configuration reviewed before printing
-            </span>
-            <span>
-              <RotateCcw size={16} />
-              Preview details confirmed by studio
-            </span>
-            <span>
-              <Info size={16} />
-              Use the info buttons beside materials for durability notes
-            </span>
-          </div>
+          {etsyProduct ? (
+            <>
+              <div className="buybox-price">
+                <span>{priceDisplay ?? 'Price on Etsy'}</span>
+                <small>{priceDisplay ? 'Confirm the current price on Etsy' : 'Made to order'}</small>
+              </div>
+              <p className="buybox-etsy-note">{getEtsyOptionsNote(product)}</p>
+              <EtsyLink product={product} />
+              <div className="buybox-notes">
+                <span>
+                  <Package size={16} />
+                  Made to order after you check out on Etsy
+                </span>
+                <span>
+                  <Truck size={16} />
+                  Payment, shipping, and order updates through Etsy
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="buybox-price">
+                <span>{priceDisplay}</span>
+                <small>{selectedColor.priceNote ?? 'Made after selection'}</small>
+              </div>
+              <OptionGroup title="Material">
+                <MaterialChoices
+                  product={product}
+                  selectedMaterial={selectedMaterial}
+                  onSelectMaterial={setSelectedMaterial}
+                />
+              </OptionGroup>
+              <OptionGroup title={`${selectedMaterial} colors`}>
+                <ColorSwatches
+                  colors={materialColors}
+                  selectedColor={selectedColorName}
+                  onSelectColor={setSelectedColorName}
+                />
+              </OptionGroup>
+              <div className="buybox-selected">
+                <strong>Current configuration</strong>
+                <span>{getConfigurationLabel(selectedColor, selectedMaterial)}</span>
+              </div>
+              <NavLink className="button button-primary" to={`/collection/${product.slug}/configure`}>
+                Configure selection <ArrowRight size={17} />
+              </NavLink>
+              <div className="buybox-notes">
+                <span>
+                  <Truck size={16} />
+                  Local made-to-order production
+                </span>
+                <span>
+                  <Ruler size={16} />
+                  Configuration reviewed before printing
+                </span>
+                <span>
+                  <RotateCcw size={16} />
+                  Preview details confirmed by studio
+                </span>
+                <span>
+                  <Info size={16} />
+                  Use the info buttons beside materials for durability notes
+                </span>
+              </div>
+            </>
+          )}
         </aside>
       </div>
     </section>
@@ -1137,13 +981,17 @@ function ProductConfigure() {
     return <Navigate to="/collection" replace />;
   }
 
+  if (isEtsyProduct(product)) {
+    return <Navigate to={`/collection/${product.slug}`} replace />;
+  }
+
   return <ProductConfigureContent product={product} />;
 }
 
 function ProductConfigureContent({ product }) {
   const [selectedMaterial, setSelectedMaterial] = useState(getDefaultMaterial(product));
   const materialColors = useMemo(() => getColorsForMaterial(product, selectedMaterial), [product, selectedMaterial]);
-  const [selectedColorName, setSelectedColorName] = useState(materialColors[0].name);
+  const [selectedColorName, setSelectedColorName] = useState(materialColors[0]?.name);
   const selectedColor = materialColors.find((color) => color.name === selectedColorName) ?? materialColors[0];
   const [form, setForm] = useState(() => getDefaultConfigureForm(product));
   const [copied, setCopied] = useState(false);
@@ -1151,7 +999,7 @@ function ProductConfigureContent({ product }) {
   const emailHref = getConfigurationEmailHref(product, summary);
 
   useEffect(() => {
-    if (!materialColors.some((color) => color.name === selectedColorName)) {
+    if (materialColors.length && !materialColors.some((color) => color.name === selectedColorName)) {
       setSelectedColorName(materialColors[0].name);
     }
   }, [materialColors, selectedColorName]);
@@ -1511,18 +1359,39 @@ function ProductMedia({ product, selectedColor, imageIndex = 0 }) {
       <img
         className="product-photo"
         src={imageUrl}
-        alt={`${product.title} sample print`}
+        alt={isEtsyProduct(product) ? `${product.title}, photo ${imageIndex + 1}` : `${product.title} sample print`}
         loading="lazy"
         decoding="async"
       />
     );
   }
 
-  return <ProductVisual variant={product.variant} tone={selectedColor.swatch} />;
+  return <ProductVisual variant={product.variant} tone={selectedColor?.swatch} />;
+}
+
+function EtsyLink({ product, className = 'button button-primary' }) {
+  const label = getEtsyActionLabel(product);
+
+  // rel leaves out "noreferrer" on purpose so Etsy shop stats can credit the website as the traffic source.
+  return (
+    <a
+      className={className}
+      href={getEtsyListingUrl(product)}
+      target="_blank"
+      rel="noopener"
+      aria-label={`${label}: ${product.title} (opens Etsy in a new tab)`}
+    >
+      {label} <ArrowUpRight size={17} aria-hidden="true" />
+    </a>
+  );
 }
 
 function getPriceDisplay(product, selectedColor) {
-  return selectedColor.priceAdd ? `${product.price} + $${selectedColor.priceAdd}` : product.price;
+  if (!product.price) {
+    return null;
+  }
+
+  return selectedColor?.priceAdd ? `${product.price} + $${selectedColor.priceAdd}` : product.price;
 }
 
 function getCustomizeUrl(product) {
@@ -1688,6 +1557,10 @@ function formatInches(value) {
 }
 
 function getConfigurationLabel(selectedColor, selectedMaterial) {
+  if (!selectedColor) {
+    return 'Options chosen on Etsy';
+  }
+
   return selectedColor.priceAdd
     ? `${selectedColor.name} / ${selectedMaterial} (+$${selectedColor.priceAdd})`
     : `${selectedColor.name} / ${selectedMaterial}`;
@@ -1731,7 +1604,7 @@ function getCategoryCounts(items) {
 function getMaterialCounts(items) {
   return items.reduce(
     (counts, product) => {
-      const productMaterials = new Set(product.colors.flatMap((color) => color.materials));
+      const productMaterials = new Set(getProductMaterials(product));
       productMaterials.forEach((material) => {
         counts[material] = (counts[material] ?? 0) + 1;
       });
@@ -1740,19 +1613,6 @@ function getMaterialCounts(items) {
     },
     { All: items.length }
   );
-}
-
-function getProductMaterials(product) {
-  const availableMaterials = new Set(product.colors.flatMap((color) => color.materials));
-  return Object.keys(materialInfo).filter((material) => availableMaterials.has(material));
-}
-
-function getDefaultMaterial(product) {
-  return getProductMaterials(product)[0];
-}
-
-function getColorsForMaterial(product, material) {
-  return product.colors.filter((color) => color.materials.includes(material));
 }
 
 function OptionGroup({ title, children }) {

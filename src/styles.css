@@ -3689,3 +3689,49 @@ p {
 :root[data-theme='light'] .studio-callout {
   background: linear-gradient(135deg, #eadcc9, #fffaf1 64%, #e7d5bd);
 }
+
+/* Etsy listings: options, personalization, and checkout happen on Etsy. */
+.catalog-etsy-note {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(241, 236, 225, 0.1);
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.catalog-etsy-note.fills-row {
+  grid-row: span 2;
+}
+
+.etsy-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.buybox-etsy-note {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.045);
+  line-height: 1.55;
+}
+
+:root[data-theme='light'] .catalog-etsy-note {
+  border-bottom-color: var(--border);
+}
+
+:root[data-theme='light'] .buybox-etsy-note {
+  border-color: var(--border);
+  color: var(--text);
+  background: var(--control);
+}

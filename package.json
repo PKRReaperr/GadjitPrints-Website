@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:theme": "node scripts/theme-check.mjs"
+    "test:theme": "node scripts/theme-check.mjs",
+    "test:catalog": "node scripts/catalog-check.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
