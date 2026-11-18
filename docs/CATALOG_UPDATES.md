@@ -37,9 +37,12 @@ Safeguards (tested by `npm run test:sync` without a key):
 ## Run it yourself
 
 ```powershell
-npm run sync:etsy -- --dry-run   # report what would change, write nothing
-npm run sync:etsy                # write src/data/etsy-listings.js if anything changed
+npm run sync:etsy:dry   # report what would change, write nothing
+npm run sync:etsy       # write src/data/etsy-listings.js if anything changed
 ```
+
+Use `sync:etsy:dry` rather than `npm run sync:etsy -- --dry-run`: Windows PowerShell can drop the `--`, and
+the run would then write the file.
 
 Without `ETSY_API_KEY` set, the script asks for the key with hidden input. Get the keystring and shared
 secret from https://www.etsy.com/developers/your-apps and enter them as `keystring:shared_secret`.

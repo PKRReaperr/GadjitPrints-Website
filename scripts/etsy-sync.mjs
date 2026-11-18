@@ -1,6 +1,6 @@
 // Syncs the active Etsy listings into src/data/etsy-listings.js.
 //
-//   npm run sync:etsy -- --dry-run   report what would change, write nothing
+//   npm run sync:etsy:dry            report what would change, write nothing
 //   npm run sync:etsy                write the file if anything changed
 //
 // The API key ("keystring:shared_secret") is read from the ETSY_API_KEY environment variable.

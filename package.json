@@ -10,7 +10,8 @@
     "test:theme": "node scripts/theme-check.mjs",
     "test:catalog": "node scripts/catalog-check.mjs",
     "test:sync": "node scripts/etsy-sync-check.mjs",
-    "sync:etsy": "node scripts/etsy-sync.mjs"
+    "sync:etsy": "node scripts/etsy-sync.mjs",
+    "sync:etsy:dry": "node scripts/etsy-sync.mjs --dry-run"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

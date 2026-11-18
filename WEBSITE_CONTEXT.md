@@ -173,7 +173,7 @@ npm run preview
 npm run test:catalog   # validates src/data/catalog.js
 npm run test:theme     # validates the appearance preference script
 npm run test:sync      # tests the Etsy sync safeguards against a fake API (no key needed)
-npm run sync:etsy -- --dry-run   # live Etsy check; asks for the key, writes nothing
+npm run sync:etsy:dry  # live Etsy check; asks for the key, writes nothing
 ```
 
 ## Current Known Limitations
