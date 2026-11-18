@@ -63,33 +63,47 @@ The site never shows a price. Product pages say "Price on Etsy" and link to the 
 
 ## Product Catalog
 
-All products live in `src/data/catalog.js` as the `products` array. Every product is an **active Etsy listing**; there are no studio-only or sample products. The previous MakerWorld-based configurable products (QR business card, QR code business stand, initial ornament, door hanger, luggage tag, name plate stand) and the email configurator were retired in November 2026 because none of them were sold anymore.
+Every product is an **active Etsy listing**; there are no studio-only or sample products. The previous MakerWorld-based configurable products (QR business card, QR code business stand, initial ornament, door hanger, luggage tag, name plate stand) and the email configurator were retired in November 2026 because none of them were sold anymore.
 
-Current listings (checked 2026-11-18):
+The `products` array in `src/data/catalog.js` is built from two sources:
+
+- `src/data/etsy-listings.js`: **generated** by the Etsy sync (`scripts/etsy-sync.mjs`, run every 3 hours by `.github/workflows/etsy-sync.yml`). It decides which listings exist and holds their order, slug, photos, and personalization/options flags. Never edit it by hand.
+- `listingCopy` in `src/data/catalog.js`: **hand-written** website copy (title, type, category, copy, includes) keyed by Etsy listing ID. The sync never touches it. A listing without copy still shows, using its Etsy title, the first paragraph of its Etsy description, and the "New on Etsy" category.
+
+Listings with website copy (checked 2026-11-18):
 
 1. Soccer Trophy Cup: `soccer-trophy-cup`, Etsy listing `4523619401`, Decor & Collectibles.
 2. Nikon 200–500mm Lens Hood: `nikon-200-500mm-lens-hood`, Etsy listing `4594768652`, Camera Gear.
 
-How to add, update, or remove a listing: see `docs/CATALOG_UPDATES.md`.
+How the sync works, its safeguards, and how to add copy for new listings: see `docs/CATALOG_UPDATES.md`.
 
 ### Product Data Shape
 
+`buildProducts` in `catalog.js` merges each synced listing with its copy into:
+
 ```js
 {
-  slug: 'soccer-trophy-cup',            // URL: /collection/soccer-trophy-cup. Keep stable once published.
-  title: 'Soccer Trophy Cup',
-  type: 'Championship display trophy',  // optional short descriptor; falls back to category
-  category: 'Decor & Collectibles',     // drives the Category filter
-  imageUrls: ['https://i.etsystatic.com/...'], // Etsy-hosted listing photos or local files in public/
-  copy: 'Short description written for the website.',
-  includes: ['Printed in PLA', 'Made to order'], // optional chips on cards and the detail page
+  slug: 'soccer-trophy-cup',            // from the sync; stays the same even if the Etsy title changes
+  title: 'Soccer Trophy Cup',           // listingCopy, else the shortened Etsy title
+  type: 'Championship display trophy',  // listingCopy only; the UI falls back to category
+  category: 'Decor & Collectibles',     // listingCopy, else 'New on Etsy'; drives the Category filter
+  imageUrls: ['https://i.etsystatic.com/...'], // from the sync, 794 px wide, in Etsy photo order
+  copy: 'Short description written for the website.', // listingCopy, else the Etsy summary
+  includes: ['Printed in PLA', 'Made to order'], // listingCopy only; optional chips
   etsy: {
     listingId: '4523619401',            // stable Etsy listing ID; the link is built from it
-    personalization: 'none',            // 'none' | 'optional' | 'required'
-    hasOptions: false,                  // true when the listing has variations (size, color, ...)
+    personalization: 'none',            // from the sync: 'none' | 'optional' | 'required'
+    hasOptions: false,                  // from the sync: true when the listing has variations
   },
 }
 ```
+
+### Etsy API rules that shape the site
+
+- Listing content may not be shown more than 6 hours older than Etsy, hence the 3-hourly sync.
+- The footer must keep Etsy's notice: "The term 'Etsy' is a trademark of Etsy, Inc. This Application uses Etsy's API, but is not endorsed or certified by Etsy."
+- No scraping, and request only the data the site needs. The site must not mimic Etsy's look or bypass Etsy checkout.
+- The key (`keystring:shared_secret`) is only in the GitHub Actions secret `ETSY_API_KEY`. The repo is public, so never commit it.
 
 Rules enforced by `npm run test:catalog`:
 
@@ -99,7 +113,7 @@ Rules enforced by `npm run test:catalog`:
 - Every product has `etsy.listingId`; the generated URL is `https://www.etsy.com/listing/<id>`.
 - No `price` field.
 
-Helpers in the same file (shared by the UI and the check): `getEtsyListingUrl`, `getEtsyActionLabel`, `getEtsyOptionsNote`, `needsEtsyCustomization`, `getShowcaseImages`, `isEtsyProduct`, and `etsyShopUrl`.
+Helpers in the same file (shared by the UI and the checks): `buildProducts`, `getEtsyListingUrl`, `getEtsyActionLabel`, `getEtsyOptionsNote`, `needsEtsyCustomization`, `getShowcaseImages`, `isEtsyProduct`, `etsyShopUrl`, and `fallbackCategory`.
 
 ## Website Pages
 
@@ -117,7 +131,10 @@ The app is a client-rendered Vite + React SPA using React Router.
 ## Frontend Structure
 
 - `src/main.jsx`: routing, layout (`SiteShell` with the appearance control), pages, and components.
-- `src/data/catalog.js`: product data and pure catalog helpers (no JSX, importable from Node).
+- `src/data/catalog.js`: hand-written listing copy and pure catalog helpers (no JSX, importable from Node).
+- `src/data/etsy-listings.js`: generated by the Etsy sync; do not edit.
+- `scripts/etsy-sync.mjs`, `scripts/etsy-sync-lib.mjs`, `scripts/etsy-sync-check.mjs`: the Etsy sync, its fetch/transform logic, and its tests.
+- `.github/workflows/etsy-sync.yml`: runs the sync every 3 hours on `main`.
 - `src/styles.css`: global CSS, design tokens, light theme overrides, responsive layout.
 - `public/theme.js`: runs before paint to apply the system/light/dark preference.
 - `public/brand/gadjitprints-logo.webp`: logo used in the UI; `gadjitprints-logo.png` is the source asset.
@@ -136,7 +153,7 @@ Useful areas: `.site-header`, `.hero`, `.hero-objects`, `.catalog-card`, `.catal
 
 ## Backend Structure
 
-There is no custom backend, API route, database, or server function. Product data is hand-maintained in `src/data/catalog.js`. A read-only Etsy Open API v3 sync is planned for when Etsy developer access is approved (see `docs/CATALOG_UPDATES.md`).
+There is no custom backend, API route, database, or server function, and the site never calls Etsy while customers browse. A GitHub Action reads the Etsy Open API v3 (public endpoints, API key only, read-only), commits `src/data/etsy-listings.js` when listings change, and Vercel redeploys. See `docs/CATALOG_UPDATES.md`.
 
 ## Deployment Structure
 
@@ -155,12 +172,15 @@ npm run build
 npm run preview
 npm run test:catalog   # validates src/data/catalog.js
 npm run test:theme     # validates the appearance preference script
+npm run test:sync      # tests the Etsy sync safeguards against a fake API (no key needed)
+npm run sync:etsy -- --dry-run   # live Etsy check; asks for the key, writes nothing
 ```
 
 ## Current Known Limitations
 
-- The catalog is maintained by hand until the Etsy API sync exists.
+- Website copy for new listings is written by hand; until then they show the Etsy title and summary.
 - Product photos are loaded from Etsy's image CDN.
+- If the sync fails for more than 6 hours, listing content can fall behind Etsy; GitHub emails each failed run.
 - The checks do not render the app, so always open the site in a browser before shipping.
 - No full accessibility audit has been done yet.
 
@@ -175,4 +195,5 @@ npm run test:theme     # validates the appearance preference script
 - Keep the visual tone dark, premium, warm, and tactile, and keep the light theme working.
 - Keep Houston and Gadjit references limited to the Studio page.
 - Preserve the Vercel SPA rewrite.
-- Run `npm run build`, `npm run test:catalog`, and `npm run test:theme`, then check the pages in a browser.
+- Keep the Etsy footer notice and the 3-hour sync schedule. Never commit the Etsy key.
+- Run `npm run build`, `npm run test:catalog`, `npm run test:theme`, and `npm run test:sync`, then check the pages in a browser.

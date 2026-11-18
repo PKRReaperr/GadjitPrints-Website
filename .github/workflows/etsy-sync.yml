@@ -1,0 +1,68 @@
+# Keeps the website's product list in step with the active listings in the Etsy shop.
+# Etsy's API Terms do not allow showing listing content more than 6 hours older than Etsy, so this
+# runs every 3 hours (GitHub can delay scheduled runs). It commits only when a listing changed, and
+# that push makes Vercel redeploy. Scheduled runs only happen on the default branch (main).
+#
+# To pause it: Actions tab > "Etsy listing sync" > ... > Disable workflow. The site keeps the last list.
+name: Etsy listing sync
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: report changes without committing'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: etsy-sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check the sync safeguards
+        run: npm run test:sync
+
+      - name: Fetch active Etsy listings
+        id: sync
+        env:
+          ETSY_API_KEY: ${{ secrets.ETSY_API_KEY }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then
+            node scripts/etsy-sync.mjs --dry-run
+          else
+            node scripts/etsy-sync.mjs
+          fi
+
+      - name: Check the catalog and build the site
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          npm run test:catalog
+          npm run build
+
+      - name: Commit the updated listings
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898283+github-actions[bot]@users.noreply.github.com'
+          git add src/data/etsy-listings.js
+          git commit -m 'Sync Etsy listings'
+          git push

@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:theme": "node scripts/theme-check.mjs",
-    "test:catalog": "node scripts/catalog-check.mjs"
+    "test:catalog": "node scripts/catalog-check.mjs",
+    "test:sync": "node scripts/etsy-sync-check.mjs",
+    "sync:etsy": "node scripts/etsy-sync.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

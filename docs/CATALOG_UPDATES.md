@@ -1,66 +1,85 @@
 # Updating the product catalog
 
 The website lists the active listings from the Gadjit Prints Etsy shop
-(https://www.etsy.com/shop/GadjitNet). Until the Etsy API sync is set up, the list is maintained by
-hand in `src/data/catalog.js`. Etsy stays the source of truth for price, stock, options, and orders,
-so the website never stores those.
+(https://www.etsy.com/shop/GadjitNet). Etsy stays the source of truth for price, stock, options, and
+orders, so the website never stores those.
 
-## Add a new listing
+The catalog has two parts:
 
-1. Publish the listing in Etsy Shop Manager and make sure it is active.
-2. Copy the listing ID from its URL: `https://www.etsy.com/listing/<listingId>/...`.
-3. Get the photo URLs. On the listing page, open each photo and copy its image address. It looks like
-   `https://i.etsystatic.com/<shop>/r/il/<hash>/<photoId>/il_fullxfull.<photoId>_<key>.jpg`.
-   Replace `il_fullxfull` (or any other size) with `il_794xN` so the site loads a 794 px wide image.
-4. Add an entry to `products` in `src/data/catalog.js`:
+| File | Written by | Holds |
+|---|---|---|
+| `src/data/etsy-listings.js` | The Etsy sync (never edit by hand) | Which listings are shown, their order, URL slug, photos, and whether they have personalization or options |
+| `listingCopy` in `src/data/catalog.js` | You | The website title, short descriptor, category, description, and chips for each listing, keyed by Etsy listing ID |
+
+## How the sync works
+
+`scripts/etsy-sync.mjs` reads the shop's active listings through the Etsy Open API v3. It uses only
+public endpoints, which need the API key alone: no OAuth, and no order, buyer, or private shop data.
+
+- The GitHub Action `.github/workflows/etsy-sync.yml` runs it every 3 hours. Etsy's API Terms do not
+  allow showing listing content more than 6 hours older than Etsy, and GitHub can delay scheduled runs.
+- It commits `src/data/etsy-listings.js` only when a listing changed. That push makes Vercel redeploy.
+- The API key lives only in the GitHub Actions secret `ETSY_API_KEY`, as `keystring:shared_secret`.
+- Scheduled runs only happen on `main`. GitHub turns off scheduled workflows in a public repo after
+  60 days without repository activity and emails a warning first; re-enable it from the Actions tab.
+
+Safeguards (tested by `npm run test:sync` without a key):
+
+- If any request fails, Etsy returns fewer listings than it reports, or details are missing, nothing
+  is written, the run fails, and GitHub emails the failure. The site keeps the last synced list.
+- Rate limits (429) and server errors are retried with backoff; a rejected key (403) is not retried.
+- A shop with genuinely zero active listings writes an empty list; the site shows "New pieces are on
+  the way". A shop that cannot be found is an error, not an empty list.
+- Drafts, inactive, and sold-out listings are not shown. Listings without photos are skipped.
+- A listing keeps its website URL even if its Etsy title changes later.
+- Prices are never stored. Error messages never include the key.
+
+## Run it yourself
+
+```powershell
+npm run sync:etsy -- --dry-run   # report what would change, write nothing
+npm run sync:etsy                # write src/data/etsy-listings.js if anything changed
+```
+
+Without `ETSY_API_KEY` set, the script asks for the key with hidden input. Get the keystring and shared
+secret from https://www.etsy.com/developers/your-apps and enter them as `keystring:shared_secret`.
+
+In GitHub: Actions tab, "Etsy listing sync", "Run workflow". "Dry run" is ticked by default; untick it
+to commit changes.
+
+Report lines: `+` added, `-` removed (its old URL redirects to `/collection`), `~` changed, `!` skipped
+with a reason, `?` shown without website copy yet.
+
+## When you add a listing on Etsy
+
+The next sync adds it automatically, using a short version of the Etsy title, the first paragraph of
+the Etsy description, and the "New on Etsy" category. To give it website copy:
+
+1. Find its listing ID in the sync report or in its URL: `https://www.etsy.com/listing/<listingId>/...`.
+2. Add an entry to `listingCopy` in `src/data/catalog.js`:
 
    ```js
-   {
-     slug: 'short-readable-name',        // becomes /collection/short-readable-name; never change it later
+   '1234567890': {
      title: 'Short Product Name',
      type: 'One-line descriptor',        // optional
      category: 'Camera Gear',            // reuse an existing category when it fits
-     imageUrls: ['https://i.etsystatic.com/.../il_794xN....jpg'],
      copy: 'Two or three calm sentences written for the website.',
      includes: ['Printed in PETG', 'Made to order', 'Ships from Texas'],
-     etsy: {
-       listingId: '1234567890',
-       personalization: 'none',          // 'optional' or 'required' if the listing has a personalization box
-       hasOptions: false,                // true if the listing has variations (size, color, ...)
-     },
    },
    ```
 
-   Personalization or variations switch the button to "Customize on Etsy"; otherwise it says "View on Etsy".
-5. Run the checks:
+3. Run `npm run test:catalog` and `npm run build`, open the product page with `npm run dev`, then
+   commit on a branch, check the Vercel preview, and merge to `main`.
 
-   ```bash
-   npm run test:catalog
-   npm run build
-   ```
+## When you change or remove a listing on Etsy
 
-6. Run `npm run dev`, open the new product page, and click the Etsy button to confirm it opens the right listing.
-7. Commit on a branch, push, check the Vercel preview, then merge to `main`.
+- Photos, personalization, options, or deactivation: the next sync picks it up. Nothing to do.
+- If you rewrite the description on Etsy, update that listing's `copy` in `listingCopy` if it no
+  longer matches.
+- Website copy for a listing that is no longer active is harmless; `npm run test:catalog` notes it so
+  you can remove it.
 
-## Update a listing
+## Pausing or undoing the sync
 
-- Edited title, description, or photos on Etsy: update `title`, `copy`, or `imageUrls` to match.
-- Added personalization or variations on Etsy: update `etsy.personalization` or `etsy.hasOptions`.
-- Keep the `slug` the same so existing links keep working.
-
-## Remove a listing (sold out, deactivated, or deleted on Etsy)
-
-Delete its entry from `products`. Its old URL then redirects to `/collection`. If the shop has no active
-listings at all, `/collection` shows "New pieces are on the way" with a link to the Etsy shop.
-
-## Later: automatic sync with the Etsy API
-
-When Etsy developer access is approved, a read-only sync can replace these manual steps:
-
-- A script fetches the shop's active listings and photos with Etsy Open API v3, reading 100 listings per page.
-- A daily GitHub Action runs it with the API key stored in GitHub Secrets, commits the result when listings
-  change, and Vercel redeploys. The site never calls Etsy while customers browse.
-- If Etsy really returns zero active listings, the empty list is written and the site shows the empty state.
-- If the request fails, nothing is written, the Action fails visibly, and the last good list stays live.
-- Before building it, check Etsy's current API documentation for endpoints, rate limits, caching rules,
-  and the required attribution notice.
+- Pause: Actions tab, "Etsy listing sync", "...", "Disable workflow". The site keeps the last list.
+- Undo a bad sync: revert its "Sync Etsy listings" commit on `main`.

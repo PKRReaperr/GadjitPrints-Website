@@ -838,6 +838,10 @@ function Footer() {
         </NavLink>
         <ShopLink />
       </div>
+      <p className="footer-notice">
+        The term 'Etsy' is a trademark of Etsy, Inc. This Application uses Etsy's API, but is not endorsed or
+        certified by Etsy.
+      </p>
     </footer>
   );
 }

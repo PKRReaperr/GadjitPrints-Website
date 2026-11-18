@@ -8,6 +8,7 @@ import {
   getEtsyListingUrl,
   getShowcaseImages,
   isEtsyProduct,
+  listingCopy,
   needsEtsyCustomization,
   personalizationModes,
   products,
@@ -79,6 +80,18 @@ for (const product of products) {
   if (hasOptions !== undefined && typeof hasOptions !== 'boolean') fail(product, 'etsy.hasOptions must be true or false');
   if (getEtsyListingUrl(product) !== `https://www.etsy.com/listing/${listingId}`) fail(product, 'Etsy URL does not match listing ID');
   if ('price' in product) fail(product, 'do not store prices here; Etsy is the source of truth for price');
+}
+
+const activeIds = new Set(products.map((product) => product.etsy?.listingId));
+for (const listingId of Object.keys(listingCopy)) {
+  if (!activeIds.has(listingId)) {
+    console.warn(`note: website copy for listing ${listingId} is unused (the listing is not active on Etsy); it can be removed`);
+  }
+}
+for (const product of products) {
+  if (!listingCopy[product.etsy?.listingId]) {
+    console.warn(`note: ${product.slug} (listing ${product.etsy?.listingId}) has no website copy yet; it shows the Etsy title and summary`);
+  }
 }
 
 if (errors.length) {
