@@ -13,43 +13,47 @@ import {
   products,
 } from './data/catalog.js';
 
+// The brand mark links home, so the navigation lists only the inner pages.
 const navItems = [
-  { to: '/', label: 'Home' },
   { to: '/collection', label: 'Products' },
   { to: '/process', label: 'How it works' },
   { to: '/studio', label: 'Studio' },
 ];
 
-// Black mark on a transparent background, like the Gadjit.net logo; CSS inverts it in dark mode.
+// Black mark on a transparent background; CSS inverts it in dark mode.
 const brandLogo = '/brand/gadjitprints-mark.webp';
+
+// The listing whose first photo leads the homepage. Falls back to the first listing
+// if this one is ever removed from the shop.
+const featuredSlug = 'soccer-trophy-cup';
 
 const processSteps = [
   {
     step: '01',
-    title: 'Browse the collection',
-    text: 'Find a piece here and open it to see real photos of the finished print and what it is made from.',
+    title: 'Choose a piece',
+    text: 'Browse the collection and open a piece to see photos of the finished print.',
   },
   {
     step: '02',
     title: 'Order on Etsy',
-    text: 'Follow the link to the Etsy listing to choose any available options, add personalization when a piece offers it, and check out. Etsy handles payment.',
+    text: 'The Etsy listing is where you choose options, add personalization when a piece offers it, and check out.',
   },
   {
     step: '03',
     title: 'Printed to order',
-    text: 'Your piece is printed after the order comes in, then cleaned up and checked before it ships. Small layer lines are part of the process.',
+    text: 'Your piece is printed after the order arrives, then cleaned up and checked. Fine layer lines are part of the process.',
   },
   {
     step: '04',
     title: 'Shipped to you',
-    text: 'Etsy sends tracking and order updates, and you can message the shop through Etsy with any questions.',
+    text: 'Etsy sends tracking and order updates. Message the shop through Etsy with any questions.',
   },
 ];
 
-const studioFacts = [
-  ['01', 'Made to order', 'Each piece is printed after it is ordered, not pulled from a shelf.'],
-  ['02', 'Real product photos', 'Every photo shows a finished print from the studio.'],
-  ['03', 'Ordered on Etsy', 'Options, personalization, payment, and shipping updates happen on Etsy.'],
+const makingSteps = [
+  ['Printed after you order', 'Nothing is printed ahead and stored. Each piece starts once its order comes in.'],
+  ['Cleaned up and checked', 'Every print is cleaned up and looked over before it is packed.'],
+  ['Material named on each piece', 'Each product page lists what the piece is printed in, so you know what arrives.'],
 ];
 
 function App() {
@@ -141,9 +145,7 @@ function SiteShell({ children }) {
       </a>
       <header className={`site-header${open ? ' is-open' : ''}`}>
         <div className="container header-inner">
-          <NavLink className="brand" to="/" onClick={() => setOpen(false)}>
-            <img src={brandLogo} alt="Gadjit Prints" width="50" height="50" decoding="async" />
-          </NavLink>
+          <Brand className="brand" onClick={() => setOpen(false)} />
           <nav className="nav" id="site-navigation" aria-label="Primary navigation">
             {navItems.map((item) => (
               <NavLink key={item.to} to={item.to} onClick={() => setOpen(false)}>
@@ -154,7 +156,7 @@ function SiteShell({ children }) {
           <div className="header-actions">
             <div className="appearance-control" ref={appearancePanelRef}>
               <button
-                className="icon-button"
+                className="icon-button icon-button-quiet"
                 type="button"
                 ref={appearanceButtonRef}
                 aria-label="Choose appearance"
@@ -162,11 +164,11 @@ function SiteShell({ children }) {
                 aria-expanded={appearanceOpen}
                 onClick={() => setAppearanceOpen((current) => !current)}
               >
-                <AppearanceIcon size={18} aria-hidden="true" />
+                <AppearanceIcon size={17} strokeWidth={1.75} aria-hidden="true" />
               </button>
               {appearanceOpen ? (
                 <div className="appearance-panel" role="dialog" aria-label="Appearance settings">
-                  <p className="label">Appearance</p>
+                  <p className="panel-title">Appearance</p>
                   {[
                     ['system', 'System', Monitor],
                     ['light', 'Light', Sun],
@@ -180,7 +182,7 @@ function SiteShell({ children }) {
                         checked={preference === value}
                         onChange={() => chooseAppearance(value)}
                       />
-                      <Icon size={16} aria-hidden="true" />
+                      <Icon size={16} strokeWidth={1.75} aria-hidden="true" />
                       <span>{label}</span>
                     </label>
                   ))}
@@ -188,7 +190,7 @@ function SiteShell({ children }) {
               ) : null}
             </div>
             <button
-              className="icon-button menu-toggle"
+              className="icon-button icon-button-quiet menu-toggle"
               type="button"
               ref={menuButtonRef}
               aria-label={open ? 'Close navigation' : 'Open navigation'}
@@ -196,7 +198,7 @@ function SiteShell({ children }) {
               aria-expanded={open}
               onClick={() => setOpen((current) => !current)}
             >
-              {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+              {open ? <X size={20} strokeWidth={1.75} aria-hidden="true" /> : <Menu size={20} strokeWidth={1.75} aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -207,86 +209,110 @@ function SiteShell({ children }) {
   );
 }
 
+function Brand({ className, onClick, lazy = false }) {
+  return (
+    <NavLink className={className} to="/" onClick={onClick} aria-label="Gadjit Prints, home">
+      <img
+        src={brandLogo}
+        alt=""
+        width="36"
+        height="36"
+        decoding="async"
+        loading={lazy ? 'lazy' : undefined}
+      />
+      <span className="wordmark" aria-hidden="true">
+        Gadjit Prints
+      </span>
+    </NavLink>
+  );
+}
+
 function Home() {
   return (
     <div className="container page">
-      <Hero />
-      <AvailableNow />
-      <MadeToOrderBand />
-      <StudioIntro />
+      <HomeIntro />
+      <FeaturedPiece />
+      <HomeCollection />
+      <HomeOrdering />
+      <StudioNote />
     </div>
   );
 }
 
-function Hero() {
-  const heroImages = getShowcaseImages(products, 2);
+function HomeIntro() {
+  return (
+    <section className="intro intro-home" aria-labelledby="home-title">
+      <h1 id="home-title" className="display">
+        <span className="line">Finished prints,</span> <span className="line">made one order at a time.</span>
+      </h1>
+      <p className="lead">Useful, giftable pieces from a small 3D printing studio, printed after you order on Etsy.</p>
+      <NavLink className="button button-primary" to="/collection">
+        Browse products
+      </NavLink>
+    </section>
+  );
+}
+
+function FeaturedPiece() {
+  const product = products.find((item) => item.slug === featuredSlug) ?? products[0];
+  const imageUrl = product?.imageUrls?.[0];
+
+  if (!imageUrl) {
+    return null;
+  }
 
   return (
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="hero-copy">
-        <h1 id="hero-title" className="display">
-          Finished prints, made one order at a time.
-        </h1>
-        <p className="lead">Practical, giftable, and display-ready pieces, printed after you order on Etsy.</p>
-        <div className="actions">
-          <NavLink className="button button-primary" to="/collection">
-            Browse products <ArrowRight size={18} aria-hidden="true" />
+    <section className="featured" aria-label="Featured piece">
+      <NavLink className="featured-link" to={`/collection/${product.slug}`}>
+        <span className="featured-mat">
+          <img src={imageUrl} alt={product.title} decoding="async" fetchpriority="high" />
+        </span>
+        <span className="featured-caption">
+          <span className="featured-name">{displayName(product.title)}</span>
+          <span className="featured-cue">
+            View the piece <ArrowRight size={16} strokeWidth={1.75} aria-hidden="true" />
+          </span>
+        </span>
+      </NavLink>
+    </section>
+  );
+}
+
+function HomeCollection() {
+  const shown = products.slice(0, 3);
+
+  return (
+    <section className="section" aria-labelledby="collection-title">
+      <div className="section-heading">
+        <h2 id="collection-title">The collection</h2>
+        {products.length > shown.length ? (
+          <NavLink className="text-link" to="/collection">
+            View all {products.length}
           </NavLink>
-          <ShopLink />
-        </div>
+        ) : null}
       </div>
-      {heroImages.length ? (
-        <div className={`hero-media hero-media-${heroImages.length}`}>
-          {heroImages.map(({ product, imageUrl }) => (
-            <NavLink className="hero-tile" key={imageUrl} to={`/collection/${product.slug}`}>
-              <span className="photo-frame">
-                <img src={imageUrl} alt={product.title} decoding="async" fetchpriority="high" />
-              </span>
-              <span className="hero-tile-caption">
-                <span>{displayName(product.title)}</span>
-                <ArrowRight size={16} aria-hidden="true" />
-              </span>
-            </NavLink>
-          ))}
-        </div>
-      ) : null}
+      {shown.length ? <ProductGrid items={shown} /> : <EmptyCatalog />}
     </section>
   );
 }
 
-function AvailableNow() {
+function HomeOrdering() {
   return (
-    <section className="section" aria-labelledby="available-title">
-      <div className="section-heading section-heading-split">
-        <h2 id="available-title">Ready to order</h2>
-        <NavLink className="text-link" to="/collection">
-          View all products <ArrowRight size={16} aria-hidden="true" />
+    <section className="section ordering" aria-labelledby="ordering-title">
+      <div className="section-heading">
+        <h2 id="ordering-title">How ordering works</h2>
+        <NavLink className="text-link" to="/process">
+          The details
         </NavLink>
       </div>
-      {products.length ? (
-        <ProductGrid items={products.slice(0, 4)} />
-      ) : (
-        <EmptyCatalog />
-      )}
-    </section>
-  );
-}
-
-function MadeToOrderBand() {
-  return (
-    <section className="section band" aria-labelledby="made-title">
-      <div className="band-heading">
-        <h2 id="made-title">Browse here. Order on Etsy. Printed for you.</h2>
-        <NavLink className="button button-light" to="/process">
-          See how it works <ArrowRight size={18} aria-hidden="true" />
-        </NavLink>
-      </div>
-      <ol className="band-steps">
+      <ol className="step-columns">
         {processSteps.slice(1).map((step, index) => (
           <li key={step.step}>
-            <span className="step-number">{String(index + 1).padStart(2, '0')}</span>
-            <strong>{step.title}</strong>
-            <span>{step.text}</span>
+            <span className="numeral" aria-hidden="true">
+              {index + 1}
+            </span>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
           </li>
         ))}
       </ol>
@@ -294,29 +320,17 @@ function MadeToOrderBand() {
   );
 }
 
-function StudioIntro() {
-  const [studioImage] = getShowcaseImages(products, 4).slice(-1);
-
+function StudioNote() {
   return (
-    <section className="section split" aria-labelledby="studio-intro-title">
-      {studioImage ? (
-        <div className="split-media">
-          <span className="photo-frame">
-            <img src={studioImage.imageUrl} alt={studioImage.product.title} loading="lazy" decoding="async" />
-          </span>
-        </div>
-      ) : null}
-      <div className="split-copy">
-        <h2 id="studio-intro-title">A small studio for useful, personal pieces.</h2>
-        <p>
-          Gadjit Prints designs and prints practical and display-worthy pieces to order. Each one is printed on its
-          own, cleaned up, and looked over before it leaves the studio. The collection grows as new pieces are listed
-          on Etsy.
-        </p>
-        <NavLink className="text-link" to="/studio">
-          About the studio <ArrowRight size={16} aria-hidden="true" />
-        </NavLink>
-      </div>
+    <section className="section studio-note" aria-labelledby="studio-note-title">
+      <h2 id="studio-note-title">A small studio for useful, personal pieces.</h2>
+      <p>
+        Each piece is printed on its own, cleaned up, and looked over before it ships. The collection grows as new
+        pieces are listed.
+      </p>
+      <NavLink className="text-link" to="/studio">
+        About the studio
+      </NavLink>
     </section>
   );
 }
@@ -332,37 +346,38 @@ function Collection() {
   return (
     <div className="container page">
       <PageIntro
-        title={'Made-⁠to-⁠order 3D prints'}
-        copy="Every piece here is an active listing in the Gadjit Prints Etsy shop."
+        title="The collection"
+        copy="Every piece is a current listing in the Gadjit Prints Etsy shop, printed after you order."
       />
       {products.length ? (
         <section className="catalog" aria-label="Products">
-          <div className="catalog-toolbar">
-            <div className="filter-chips" role="group" aria-label="Filter by category">
-              {categories.map((category) => (
-                <button
-                  className={`chip${activeCategory === category ? ' is-active' : ''}`}
-                  key={category}
-                  type="button"
-                  aria-pressed={activeCategory === category}
-                  onClick={() => setActiveCategory(category)}
-                >
-                  {category}
-                  <span className="chip-count">{counts[category] ?? 0}</span>
-                </button>
-              ))}
+          {categories.length > 2 ? (
+            <div className="catalog-toolbar">
+              <div className="filters" role="group" aria-label="Filter by category">
+                {categories.map((category) => (
+                  <button
+                    className={`filter${activeCategory === category ? ' is-active' : ''}`}
+                    key={category}
+                    type="button"
+                    aria-pressed={activeCategory === category}
+                    onClick={() => setActiveCategory(category)}
+                  >
+                    {category}
+                    <span className="filter-count">{counts[category] ?? 0}</span>
+                  </button>
+                ))}
+              </div>
+              <p className="results-count" role="status">
+                {filteredProducts.length} {filteredProducts.length === 1 ? 'piece' : 'pieces'}
+              </p>
             </div>
-            <p className="results-count" role="status">
-              {filteredProducts.length} {filteredProducts.length === 1 ? 'piece' : 'pieces'}
-            </p>
-          </div>
-          <OrderingNote />
+          ) : null}
           {filteredProducts.length ? (
             <ProductGrid items={filteredProducts} />
           ) : (
             <div className="empty-state">
-              <h2>No products in that category.</h2>
-              <p>Show all categories to see everything that is available right now.</p>
+              <h2>No pieces in that category.</h2>
+              <p>Show every category to see what is available right now.</p>
               <button className="button button-secondary" type="button" onClick={() => setActiveCategory('All')}>
                 Show all
               </button>
@@ -380,40 +395,42 @@ function Process() {
   return (
     <div className="container page">
       <PageIntro
-        title="Browse here. Order on Etsy. Printed for you."
-        copy="Gadjit Prints shows each piece here with real photos. Ordering, options, personalization, payment, and shipping all happen on Etsy."
+        title="How ordering works"
+        copy="You browse here and order on Etsy. Options, personalization, payment, and shipping updates all happen there."
       />
-      <section className="section" aria-label="Ordering steps">
+      <section className="section section-tight" aria-label="Ordering steps">
         <ol className="steps">
-          {processSteps.map((step) => (
+          {processSteps.map((step, index) => (
             <li className="step" key={step.step}>
-              <span className="step-number">{step.step}</span>
+              <span className="numeral" aria-hidden="true">
+                {index + 1}
+              </span>
               <h2>{step.title}</h2>
               <p>{step.text}</p>
             </li>
           ))}
         </ol>
       </section>
-      <section className="section" aria-labelledby="good-to-know-title">
+      <section className="section" aria-labelledby="before-title">
         <div className="section-heading">
-          <h2 id="good-to-know-title">Before you order</h2>
+          <h2 id="before-title">Before you order</h2>
         </div>
         <div className="notes">
           <Note
             title="Options and personalization"
-            text="Choices such as size, color, or custom text appear on the Etsy listing whenever a piece offers them."
+            text="Choices such as size, color, or custom text appear on the Etsy listing when a piece offers them."
           />
           <Note
             title="Checkout and shipping"
-            text="Etsy handles checkout, payment, shipping, and order updates, so your order lives in your Etsy account."
+            text="Etsy handles payment, shipping, and order updates, so your order lives in your Etsy account."
           />
           <Note
-            title="Made after you order"
-            text="Pieces are printed after the order arrives, not pulled from a shelf. Allow for the processing time shown on Etsy."
+            title="Processing time"
+            text="Pieces are printed after the order arrives. Etsy shows the processing time for each listing."
           />
         </div>
       </section>
-      <CtaBand />
+      <ClosingCta />
     </div>
   );
 }
@@ -423,85 +440,70 @@ function Studio() {
 
   return (
     <div className="container page">
-      <section className="about-intro" aria-labelledby="studio-title">
-        <div className="about-intro-copy">
-          <h1 id="studio-title" className="display display-xl">
-            Small studio. Careful prints.
-          </h1>
-        </div>
-        <div className="about-intro-side">
-          <p className="lead">
-            Gadjit Prints is a small 3D printing studio for practical, personal pieces, made to order and sold through
-            Etsy.
-          </p>
-          <ol className="fact-list">
-            {studioFacts.map(([number, title, text]) => (
-              <li key={number}>
-                <span className="fact-number">{number}</span>
-                <div>
-                  <strong>{title}</strong>
-                  <span>{text}</span>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <PageIntro
+        title="Small studio. Careful prints."
+        copy="Gadjit Prints makes practical and display pieces in small numbers, each printed to order and sold through Etsy."
+      />
       {studioImages.length ? (
-        <section className={`section photo-row photo-row-${studioImages.length}`} aria-label="Finished pieces">
+        <section className={`section section-tight gallery-row gallery-row-${studioImages.length}`} aria-label="Finished pieces">
           {studioImages.map(({ product, imageUrl }) => (
             <figure key={imageUrl}>
-              <span className="photo-frame">
-                <img src={imageUrl} alt={product.title} loading="lazy" decoding="async" />
-              </span>
-              <figcaption>{product.title}</figcaption>
+              <NavLink className="mat-frame" to={`/collection/${product.slug}`} aria-label={product.title}>
+                <img src={imageUrl} alt="" loading="lazy" decoding="async" />
+              </NavLink>
+              <figcaption>{displayName(product.title)}</figcaption>
             </figure>
           ))}
         </section>
       ) : null}
-      <section className="section about-story" aria-labelledby="story-title">
-        <h2 id="story-title">Not mass produced</h2>
-        <div className="about-story-copy">
-          <p>
-            The studio exists to make well-made 3D prints easy to find and easy to order, without losing the attention
-            that makes a made-to-order piece worthwhile.
-          </p>
-          <p>
-            Every piece is printed after it is ordered, then cleaned up and checked before it ships. That can take a
-            little longer than a mass-production shop, but each piece gets real attention.
-          </p>
-          <p className="supporting-note">
-            Gadjit Prints is a sister studio to{' '}
-            <a href="https://gadjit.net" target="_blank" rel="noreferrer">
-              Gadjit
-            </a>
-            .
-          </p>
+      <section className="section" aria-labelledby="making-title">
+        <div className="section-heading">
+          <h2 id="making-title">How each piece is made</h2>
         </div>
+        <ol className="step-columns">
+          {makingSteps.map(([title, text], index) => (
+            <li key={title}>
+              <span className="numeral" aria-hidden="true">
+                {index + 1}
+              </span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </li>
+          ))}
+        </ol>
       </section>
-      <CtaBand />
+      <section className="section studio-note" aria-label="About Gadjit Prints">
+        <p>
+          The collection grows as new pieces are listed on Etsy. Gadjit Prints is a sister studio to{' '}
+          <a href="https://gadjit.net" target="_blank" rel="noreferrer">
+            Gadjit
+          </a>
+          .
+        </p>
+      </section>
+      <ClosingCta />
     </div>
   );
 }
 
 function PageIntro({ title, copy }) {
   return (
-    <section className="page-intro">
+    <section className="intro">
       <h1 className="display">{title}</h1>
-      <p className="lead">{copy}</p>
+      {copy ? <p className="lead">{copy}</p> : null}
     </section>
   );
 }
 
-function CtaBand() {
+function ClosingCta() {
   return (
-    <section className="section band band-cta" aria-labelledby="cta-title">
-      <h2 id="cta-title">Find a piece to order</h2>
+    <section className="section closing" aria-labelledby="closing-title">
+      <h2 id="closing-title">Find a piece to order</h2>
       <div className="actions">
-        <NavLink className="button button-light" to="/collection">
-          Browse products <ArrowRight size={18} aria-hidden="true" />
+        <NavLink className="button button-primary" to="/collection">
+          Browse products
         </NavLink>
-        <ShopLink className="text-link text-link-light" />
+        <ShopLink />
       </div>
     </section>
   );
@@ -513,15 +515,6 @@ function Note({ title, text }) {
       <h3>{title}</h3>
       <p>{text}</p>
     </article>
-  );
-}
-
-function OrderingNote() {
-  return (
-    <p className="ordering-note">
-      <span className="marker" aria-hidden="true" />
-      Each piece is printed after you order. Options, personalization, and checkout happen on Etsy.
-    </p>
   );
 }
 
@@ -553,10 +546,8 @@ function ProductCard({ product }) {
 
   return (
     <article className="product-card">
-      <NavLink className="product-card-media" to={detailUrl} tabIndex={-1} aria-hidden="true">
-        <span className="photo-frame">
-          <ProductMedia product={product} imageIndex={0} decorative />
-        </span>
+      <NavLink className="mat-frame product-card-media" to={detailUrl} tabIndex={-1} aria-hidden="true">
+        <ProductMedia product={product} imageIndex={0} decorative />
       </NavLink>
       <div className="product-card-body">
         <h3 className="product-card-title">
@@ -565,10 +556,10 @@ function ProductCard({ product }) {
         <p className={`product-card-type${product.type ? '' : ' is-summary'}`}>{product.type ?? product.copy}</p>
         {optionsLabel ? <p className="product-card-options">{optionsLabel}</p> : null}
         <div className="product-card-actions">
-          <EtsyLink product={product} className="button button-secondary button-small" />
-          <NavLink className="text-link" to={detailUrl} aria-label={`Details: ${product.title}`}>
-            Details
+          <NavLink className="text-link" to={detailUrl} aria-label={`View details: ${product.title}`}>
+            View details
           </NavLink>
+          <EtsyLink product={product} className="quiet-link" />
         </div>
       </div>
     </article>
@@ -611,6 +602,7 @@ function ProductDetailContent({ product }) {
   const imageCount = product.imageUrls?.length ?? 0;
   const showPrevious = () => setSelectedImageIndex((index) => (index === 0 ? imageCount - 1 : index - 1));
   const showNext = () => setSelectedImageIndex((index) => (index === imageCount - 1 ? 0 : index + 1));
+  const closerLook = imageCount >= 3 ? product.imageUrls.slice(1, 4) : [];
 
   useEffect(() => {
     setSelectedImageIndex(0);
@@ -620,25 +612,23 @@ function ProductDetailContent({ product }) {
     <div className="container page product-page">
       <nav className="crumbs" aria-label="Breadcrumb">
         <NavLink to="/collection">Products</NavLink>
-        <ChevronRight size={14} aria-hidden="true" />
+        <ChevronRight size={13} strokeWidth={1.75} aria-hidden="true" />
         <span>{product.category}</span>
-        <ChevronRight size={14} aria-hidden="true" />
-        <span aria-current="page">{product.title}</span>
       </nav>
       <div className="product-layout">
         <section className="gallery" aria-label={`${product.title} photos`}>
-          <div className="gallery-frame photo-frame">
-            <ProductMedia product={product} imageIndex={selectedImageIndex} />
+          <div className={`gallery-frame mat-frame${imageCount > 1 ? ' has-controls' : ''}`}>
+            <ProductMedia product={product} imageIndex={selectedImageIndex} eager />
             {imageCount > 1 ? (
               <div className="gallery-controls">
-                <button className="icon-button" type="button" onClick={showPrevious} aria-label="Previous photo">
-                  <ChevronLeft size={20} aria-hidden="true" />
+                <button className="gallery-button" type="button" onClick={showPrevious} aria-label="Previous photo">
+                  <ChevronLeft size={18} strokeWidth={1.75} aria-hidden="true" />
                 </button>
                 <span className="gallery-count" aria-live="polite">
                   {selectedImageIndex + 1} / {imageCount}
                 </span>
-                <button className="icon-button" type="button" onClick={showNext} aria-label="Next photo">
-                  <ChevronRight size={20} aria-hidden="true" />
+                <button className="gallery-button" type="button" onClick={showNext} aria-label="Next photo">
+                  <ChevronRight size={18} strokeWidth={1.75} aria-hidden="true" />
                 </button>
               </div>
             ) : null}
@@ -661,10 +651,19 @@ function ProductDetailContent({ product }) {
           ) : null}
         </section>
         <section className="product-info" aria-labelledby="product-title">
-          <h1 id="product-title" className="product-title">
-            {displayName(product.title)}
-          </h1>
-          {product.type ? <p className="product-type">{product.type}</p> : null}
+          <div className="product-summary">
+            <h1 id="product-title" className="product-title">
+              {displayName(product.title)}
+            </h1>
+            {product.type ? <p className="product-type">{product.type}</p> : null}
+            {product.includes?.length ? (
+              <ul className="essentials" aria-label="Details">
+                {product.includes.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
           <div className="product-cta">
             {needsEtsyCustomization(product) ? (
               <p className="product-options-note">{getEtsyOptionsNote(product)}</p>
@@ -675,20 +674,27 @@ function ProductDetailContent({ product }) {
           <div className="product-description">
             <p>{product.copy}</p>
           </div>
-          {product.includes?.length ? (
-            <ul className="detail-list" aria-label="Details">
-              {product.includes.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
         </section>
       </div>
+      {closerLook.length ? (
+        <section className={`section closer-look closer-look-${closerLook.length}`} aria-labelledby="closer-title">
+          <div className="section-heading">
+            <h2 id="closer-title">A closer look</h2>
+          </div>
+          <div className="closer-look-grid">
+            {closerLook.map((imageUrl, index) => (
+              <span className="mat-frame" key={imageUrl}>
+                <img src={imageUrl} alt={`${product.title}, detail photo ${index + 1}`} loading="lazy" decoding="async" />
+              </span>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
 
-function ProductMedia({ product, imageIndex = 0, decorative = false }) {
+function ProductMedia({ product, imageIndex = 0, decorative = false, eager = false }) {
   const imageUrl = product.imageUrls?.[imageIndex] ?? product.imageUrls?.[0];
 
   if (!imageUrl) {
@@ -699,7 +705,7 @@ function ProductMedia({ product, imageIndex = 0, decorative = false }) {
     <img
       src={imageUrl}
       alt={decorative ? '' : `${product.title}, photo ${imageIndex + 1}`}
-      loading="lazy"
+      loading={eager ? undefined : 'lazy'}
       decoding="async"
     />
   );
@@ -717,7 +723,7 @@ function EtsyLink({ product, className = 'button button-primary' }) {
       rel="noopener"
       aria-label={`${label}: ${product.title} (opens Etsy in a new tab)`}
     >
-      {label} <ArrowUpRight size={16} aria-hidden="true" />
+      {label} <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
     </a>
   );
 }
@@ -731,7 +737,7 @@ function ShopLink({ className = 'text-link', label = 'Visit the Etsy shop' }) {
       rel="noopener"
       aria-label={`${label} (opens Etsy in a new tab)`}
     >
-      {label} <ArrowUpRight size={16} aria-hidden="true" />
+      {label} <ArrowUpRight size={15} strokeWidth={1.75} aria-hidden="true" />
     </a>
   );
 }
@@ -750,16 +756,14 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="container footer-inner">
-        <NavLink className="footer-brand" to="/">
-          <img src={brandLogo} alt="Gadjit Prints" width="50" height="50" loading="lazy" decoding="async" />
-        </NavLink>
+        <Brand className="brand footer-brand" lazy />
         <nav className="footer-nav" aria-label="Footer">
-          {navItems.slice(1).map((item) => (
+          {navItems.map((item) => (
             <NavLink key={item.to} to={item.to}>
               {item.label}
             </NavLink>
           ))}
-          <ShopLink className="footer-shop-link" />
+          <ShopLink className="footer-shop-link" label="Etsy shop" />
         </nav>
         <p className="footer-notice">
           The term 'Etsy' is a trademark of Etsy, Inc. This Application uses Etsy's API, but is not endorsed or
