@@ -27,13 +27,14 @@ const shopName = new URL(etsyShopUrl).pathname.split('/').filter(Boolean).pop();
 function askHidden(question) {
   return new Promise((resolve) => {
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: true });
-    process.stdout.write(question);
-    rl._writeToOutput = () => {};
-    rl.question('', (answer) => {
+    rl.question(question, (answer) => {
       rl.close();
-      process.stdout.write('\n');
+      // Confirm the hidden input arrived, so the key is not pasted again at the shell prompt.
+      process.stdout.write(answer.trim() ? '\nKey received. Contacting Etsy...\n' : '\n');
       resolve(answer.trim());
     });
+    // The question is already on screen; hide everything typed after it.
+    rl._writeToOutput = () => {};
   });
 }
 
