@@ -12,36 +12,32 @@ Gadjit Prints is a small custom 3D printing studio. The website is where custome
 
 The Houston-area and Gadjit connection should only appear as a small note on the Studio page. Gadjit Prints has a quiet connection to Gadjit, a camera business with more than 10 years of experience around used and open-box camera gear, but that is not the main site positioning. The primary message is made-to-order 3D printed pieces.
 
-The website should feel cinematic, refined, tactile, and artisan. It should communicate made-to-order care without becoming a generic ecommerce template, a mass-market tech store, or a technical 3D printer showcase.
+The website is a **sister site to Gadjit.net** (https://www.gadjit.net/). It shares Gadjit.net's typography, colors, spacing, alignment, and component styling, while keeping its own Gadjit Prints logo, finished-print photography, and made-to-order studio identity. It should feel clear, flat, and well aligned, never like a generic ecommerce template or a technical 3D printer showcase. (Until November 2026 the site used a dark "cinematic" look with amber gradients and glass panels; that direction is retired.)
 
-The owner does not want imagery of 3D printer machines. Visuals focus on finished printed objects, simple atmospheric backgrounds, and polished presentation.
+The owner does not want imagery of 3D printer machines. Visuals focus on real photos of finished printed objects.
 
 ## Brand And Design Ideology
 
 The brand personality is:
 
 - Personal but practical: useful, giftable, and display-ready pieces.
-- Artisan and premium: careful, tactile, considered.
-- Modern fabrication with warmth: digital precision softened by handcrafted presentation.
 - Calm and confident: no aggressive sales copy, no corporate tone.
-- Design-forward: editorial typography, generous spacing, dark atmospheric surfaces, subtle motion.
 - Small and honest: not mass produced, not instant, printed after the order arrives.
+- Related to Gadjit, but not a camera business: camera-business copy, eBay stats, and Gadjit trust numbers do not belong here.
 
-The visual language uses:
+The visual system (implemented in `src/styles.css`, modelled on the Gadjit.net reference repo's `_variables.scss`, `_typo.scss`, `_grid.scss`, `_homepage-beta.scss`, `_header.scss`, `_navigation.scss`, and `_about.scss`):
 
-- Dark charcoal and smoke backgrounds (plus a warm light theme).
-- Bone, stone, soft metal, muted amber, clay, moss, and warm neutral accents.
-- The black-and-white Gadjit Prints logo as a restrained inverse brand accent.
-- Refined typography with an editorial feel.
-- Soft shadows, layered depth, dimensional product cards.
-- Tactile hover states and smooth reveal animations.
-- Real photos of finished prints, never machine or process photos.
+- **Type:** Akshar (weight 500) for display headings, Mulish for paragraphs, navigation, labels, and controls, both from Google Fonts in `index.html`. Display headings are fluid (`clamp`), tight (line-height about 0.9), and uppercase. Labels are short, 12 px, bold, tracked uppercase. Paragraphs stay in sentence case. Product names keep their natural case and wrap naturally; `displayName()` in `main.jsx` keeps number ranges such as "200–500mm" together.
+- **Color (light, primary):** white `#FFFFFF`, charcoal `#262322`, Gadjit orange `#F15A24`. Orange is for active underlines, markers, focus rings, and selective accents. Small orange text uses the darker `--accent-text` (`#AD3B0D`) for contrast. Secondary surfaces are the reference's muted neutrals `#E8E2DE` and `#D8D9D4`.
+- **Dark mode:** same type, grid, and orange on charcoal surfaces (`#1A1817` page, `#262322` surfaces) with light text `#F4F1EE`. Photo mats stay light so product photos read the same in both themes. The Light / Dark / System control and saved preference (`public/theme.js`) are unchanged.
+- **Grid:** one shared content grid, `.container`: a 1440 px content cap with 16–32 px gutters (`--gutter`). Header, headings, tiles, bands, and footer align to the same edges. Section spacing is `--section-gap` (about 36 px on mobile up to 72 px on desktop); card gaps (`--card-gap`, 16–24 px) stay tighter than section gaps.
+- **Components:** a flat sticky header with the logo and wordmark on the left, centered uppercase navigation with an orange active underline, and a thin bottom rule; below 900 px a compact drop-down menu. Square or 2 px-radius buttons (charcoal primary, outline secondary, light on charcoal bands), thin rules, ruled lists with square orange markers, and a charcoal band for contrast. Hover states are restrained (color swaps, border darkening). No gradients, glows, glass panels, shadows, pills, or reveal animations.
+- **Photos:** product photos sit in `.photo-frame` tiles (4:5, `object-fit: contain`, light mat, thin border) so tall and square photos are never awkwardly cropped. Only decorative studio photos (`.split-media`, `.photo-row`) use `cover`.
 
 Avoid:
 
-- Purple-heavy AI-style gradients.
+- Amber gradients, glows, glass panels, drop shadows, pill-heavy chrome, and purple AI-style gradients.
 - Generic startup landing page patterns.
-- Generic ecommerce product grids that feel off-the-shelf.
 - Copy that implies mass production, instant fulfillment, or a checkout on the website.
 - Prices, stock counts, or ratings on the website (Etsy is the source of truth; see below).
 - Heart/share buttons on product cards.
@@ -119,12 +115,12 @@ Helpers in the same file (shared by the UI and the checks): `buildProducts`, `ge
 
 The app is a client-rendered Vite + React SPA using React Router.
 
-- `/` Homepage: hero with product photos, "Available now" carousel of the listings, ribbon, how-ordering-works preview, studio callout.
-- `/collection` All listings with a Category filter. If the catalog is empty it shows "New pieces are on the way" with a link to the Etsy shop.
-- `/collection/:slug` Product page: photo gallery with thumbnails, description, includes chips, and a buybox with "Price on Etsy", the options note, and the Etsy button. Unknown or retired slugs redirect to `/collection`.
+- `/` Homepage: asymmetric split hero (headline, one sentence, "Browse products" CTA, and the first photo of up to two listings in their own grid area), "Available now" product grid with a section-level ordering note, a charcoal "How ordering works" band with numbered steps, and a studio introduction.
+- `/collection` Left-aligned page intro, compact category filter chips with counts, a shared ordering note, and a photo-led product grid (`auto-fill`, 320 px minimum columns) that works for two listings or many. Each card has its category, name, descriptor (`type`, else a two-line summary), an options note only when the listing has personalization or options, the Etsy button, and a Details link. If the catalog is empty it shows "New pieces are on the way" with a link to the Etsy shop.
+- `/collection/:slug` Product page: two columns from 900 px (gallery with thumbnails and previous/next controls; a sticky information column with the name, descriptor, Etsy CTA, "Price on Etsy" line, description, and ruled detail lists). On mobile the gallery frame is capped at 60% of the viewport height so the name and Etsy button stay near the top. The personalization/options note appears only when the listing data calls for it. Unknown or retired slugs redirect to `/collection`.
 - `/collection/:slug/configure` Legacy configurator URL; redirects to `/collection/:slug`.
-- `/process` How it works: browse here, order on Etsy, printed to order, shipped from Texas.
-- `/studio` About the studio, including the small Gadjit note.
+- `/process` How it works: page heading, ruled numbered steps (browse, order on Etsy, printed to order, shipped from Texas), "Before you order" notes, and a closing CTA band.
+- `/studio` About the studio, adapted from Gadjit.net's About page: a large left-aligned heading between rules with a short lead and numbered facts, finished-product photos, a short story, a brief supporting note about the Gadjit connection, and a CTA band.
 - `/quote` Redirects to `/collection`.
 - `*` Redirects to `/collection`.
 
@@ -141,15 +137,15 @@ The app is a client-rendered Vite + React SPA using React Router.
 - `index.html`: Vite entry HTML.
 - `scripts/catalog-check.mjs`, `scripts/theme-check.mjs`: Node checks.
 
-Important components in `src/main.jsx`: `App`, `ScrollToTop`, `SiteShell`, `Home`, `Hero`, `FeaturedWork`, `CategoryRibbon`, `ProcessPreview`, `StudioCallout`, `Collection`, `Process`, `Studio`, `ProductCard`, `ProductDetail`, `ProductDetailContent`, `LegacyConfigureRedirect`, `ProductMedia`, `EtsyLink`, `ShopLink`, `FilterGroup`, `Footer`.
+Important components in `src/main.jsx`: `App`, `ScrollToTop`, `SiteShell` (header, appearance control, mobile menu, skip link), `Home`, `Hero`, `AvailableNow`, `MadeToOrderBand`, `StudioIntro`, `Collection`, `Process`, `Studio`, `PageIntro`, `CtaBand`, `OrderingNote`, `EmptyCatalog`, `ProductGrid`, `ProductCard`, `ProductDetail`, `ProductDetailContent`, `LegacyConfigureRedirect`, `ProductMedia`, `EtsyLink`, `ShopLink`, `Footer`.
 
 The JSX uses the classic transform (there is no Vite React plugin), so `src/main.jsx` must keep `import React from 'react'`. Without it the build succeeds but every page renders blank.
 
 ## Styling Architecture
 
-Custom CSS, no Tailwind. Tokens live on `:root` in `src/styles.css`, with `:root[data-theme='light']` overrides. Cards use radii of 8px or less, amber accents, soft shadows, and subtle reveal motion, with a `prefers-reduced-motion` fallback. Breakpoints are around `980px` and `640px`.
+Custom CSS, no Tailwind, one file: `src/styles.css`. Light-theme tokens live on `:root`; `:root[data-theme='dark']` overrides only the color tokens. Use the tokens (`--bg`, `--text`, `--text-soft`, `--rule`, `--rule-soft`, `--surface`, `--surface-alt`, `--photo-mat`, `--accent`, `--accent-text`, `--band-*`, `--gutter`, `--section-gap`, `--card-gap`) rather than raw colors or spacing. Breakpoints: `600px` (footer and photo rows go multi-column), `768px` (split hero, bands, Studio intro, steps), `900px` (desktop header navigation, two-column product page). `prefers-reduced-motion` turns transitions off.
 
-Useful areas: `.site-header`, `.hero`, `.hero-objects`, `.catalog-card`, `.catalog-etsy-note`, `.etsy-button`, `.product-detail-page`, `.detail-buybox`, `.buybox-etsy-note`, `.object-wall`, `.about-image`, `.footer-links`. Some CSS for the retired configurator and material pickers (`.material-badge`, `.swatch-*`, `.configure-*`, `.product-visual`) is still in the file but unused.
+Useful classes: `.container`, `.section`, `.display`, `.label` / `.label-accent`, `.lead`, `.button` (`-primary`, `-secondary`, `-light`, `-small`, `-block`), `.text-link`, `.icon-button`, `.site-header`, `.nav`, `.hero`, `.photo-frame`, `.product-grid`, `.product-card`, `.band`, `.page-intro`, `.chip`, `.product-layout`, `.gallery`, `.product-info`, `.detail-list`, `.steps`, `.about-intro`, `.fact-list`, `.site-footer`.
 
 ## Backend Structure
 
@@ -192,7 +188,8 @@ npm run sync:etsy:dry  # live Etsy check; asks for the key, writes nothing
 - Only list active Etsy listings in the catalog.
 - Do not reintroduce quote forms, the email configurator, or material/color pickers unless explicitly requested.
 - Do not add heart/share buttons or 3D printer machine imagery.
-- Keep the visual tone dark, premium, warm, and tactile, and keep the light theme working.
+- Follow the Gadjit.net sister-site system above (Akshar and Mulish, white / charcoal / orange, flat surfaces, thin rules, shared grid). Treat light as the primary reference and keep dark mode and the Light / Dark / System control working.
+- Check changes at 390, 768, 1280, and 1440 px in both themes, with no horizontal overflow.
 - Keep Houston and Gadjit references limited to the Studio page.
 - Preserve the Vercel SPA rewrite.
 - Keep the Etsy footer notice and the 3-hour sync schedule. Never commit the Etsy key.
